@@ -1,0 +1,41 @@
+{
+  "name": "cw2-6cosc022w-w1810569-20191250",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently -n \"CLIENT,SERVER\" -c \"cyan.bold,green.bold\" \"npm run dev --prefix client\" \"npm run start:dev --prefix server\"",
+    "server": "cd server && nodemon app.js",
+    "client": "cd client && npm run dev",
+    "prepare": "husky install",
+    "format": "prettier --write ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saumyaakumarasinghe/CW2-6COSC022W-W1810569-20191250.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/saumyaakumarasinghe/CW2-6COSC022W-W1810569-20191250/issues"
+  },
+  "homepage": "https://github.com/saumyaakumarasinghe/CW2-6COSC022W-W1810569-20191250#readme",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
+    "concurrently": "^9.1.2",
+    "husky": "^9.1.7",
+    "nodemon": "^3.1.9",
+    "prettier": "^3.5.3"
+  }
+}
