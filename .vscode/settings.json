@@ -1,0 +1,8 @@
+/*
+    Custom dictionary entries for the Code Spell Checker (cSpell)
+    These words will be treated as correctly spelled by the extension
+    Useful for proper names, technical terms, or domain-specific language
+*/
+{
+  "cSpell.words": ["Saumya", "Kumarasinghe"]
+}
