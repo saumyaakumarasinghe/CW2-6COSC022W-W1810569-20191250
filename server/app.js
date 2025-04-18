@@ -18,7 +18,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./database/connection');
 const swaggerUi = require('swagger-ui-express');
-const swaggerSpecs = require('./docs/swagger');
+const swaggerSpecs = require('./docs/swagger.docs');
 
 const app = express();
 const PORT = process.env.PORT || 8000; // Default to port 8000 if PORT is not set
