@@ -15,6 +15,8 @@ console.log(`🌱 Loading environment variables from: ${envFile}`);
 
 const express = require('express');
 const cors = require('cors');
+const routesV1 = require('./routes/v1');
+const common = require('./routes/common.routes');
 const bodyParser = require('body-parser');
 const db = require('./database/connection');
 const swaggerUi = require('swagger-ui-express');
@@ -43,7 +45,9 @@ if (process.env.NODE_ENV !== 'production') {
     app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
 }
 
-//TODO Configure routes here
+// Configure routes
+app.use('/api/', common);
+app.use('/api/v1', routesV1);
 
 // Start the server
 app.listen(PORT, () => {

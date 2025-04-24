@@ -2,8 +2,6 @@ const { ROLE } = require('../constants');
 const userDao = require('../dao/user.dao');
 const { hashPassword, comparePassword } = require('./password.service');
 const { generateToken } = require('./token.service');
-const { generateApiKey } = require('./crypto.service');
-const { createApiKey } = require('../dao/api-key.dao');
 const { updateUser } = require('../dao/user.dao');
 const { sequelize } = require('../models/index');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
@@ -13,6 +11,7 @@ const login = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { email, password } = req.body;
+    console.log(req.body, 'request body');
 
     // validate request body
     if (!email || !password) {
@@ -42,10 +41,6 @@ const login = async (req, res) => {
     // update last active at
     const now = Date.now();
     const updatedUser = await updateUser(existUser.id, { now }, transaction);
-
-    const apiKey = await generateApiKey();
-    // create api key
-    await createApiKey(apiKey, Number(existUser.id), transaction);
 
     // create token
     const tokenPayload = {
