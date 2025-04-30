@@ -1,7 +1,7 @@
 const { ROLE } = require('../constants');
 const userDao = require('../dao/user.dao');
 const { hashPassword, comparePassword } = require('./password.service');
-const { generateToken } = require('./token.service');
+const { generateToken, verifyToken } = require('./token.service');
 const { updateUser } = require('../dao/user.dao');
 const { sequelize } = require('../models/index');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
@@ -11,32 +11,22 @@ const login = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { email, password } = req.body;
-    console.log(req.body, 'request body');
 
     // validate request body
     if (!email || !password) {
-      return res
-        .status(STATUS_CODES.BAD_REQUEST)
-        .json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
+      return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
     // check if user exists
     const existUser = await userDao.getUserByEmail(email);
-    if (!existUser)
-      return res
-        .status(STATUS_CODES.NOT_FOUND)
-        .json(ERROR_MESSAGES.USER_NOT_FOUND);
+    if (!existUser) return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
 
     if (existUser.status === false)
-      return res
-        .status(STATUS_CODES.FORBIDDEN)
-        .json(ERROR_MESSAGES.USER_NOT_ACTIVE);
+      return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_NOT_ACTIVE);
 
     const loggedIn = await comparePassword(password, existUser.password);
     if (!loggedIn)
-      return res
-        .status(STATUS_CODES.UNAUTHORIZED)
-        .json(ERROR_MESSAGES.INVALID_CREDENTIALS);
+      return res.status(STATUS_CODES.UNAUTHORIZED).json(ERROR_MESSAGES.INVALID_CREDENTIALS);
 
     // update last active at
     const now = Date.now();
@@ -54,7 +44,6 @@ const login = async (req, res) => {
     const payload = {
       message: 'Login successful',
       token,
-      apiKey,
       user: {
         id: existUser.id,
         firstName: existUser.firstName,
@@ -69,41 +58,27 @@ const login = async (req, res) => {
   } catch (err) {
     await transaction.rollback();
     console.log(err.message);
-    return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json(ERROR_MESSAGES.LOGIN_FAILED);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(ERROR_MESSAGES.LOGIN_FAILED);
   }
 };
 
 const register = async (req, res) => {
   try {
-    let { firstName, lastName, email, mobile, password } = req.body;
+    let { userName, email, mobile, password, is_subscribed } = req.body;
 
     // validate request body
-    if (!firstName || !lastName || !email || !mobile || !password) {
-      return res
-        .status(STATUS_CODES.BAD_REQUEST)
-        .json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
+    if (!userName || !email || !mobile || !password || !is_subscribed) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
     // check email already exist
     const existUser = await userDao.getUserByEmail(email);
     if (existUser)
-      return res
-        .status(STATUS_CODES.FORBIDDEN)
-        .json(ERROR_MESSAGES.USER_ALREADY_EXISTS);
+      return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_ALREADY_EXISTS);
 
     password = await hashPassword(password);
-    const role = ROLE.USER;
 
-    const user = await userDao.createUser(
-      firstName,
-      lastName,
-      email,
-      mobile,
-      password,
-      role
-    );
+    const user = await userDao.createUser(userName, email, mobile, password, is_subscribed);
 
     const payload = {
       userId: user.id,
@@ -111,13 +86,48 @@ const register = async (req, res) => {
     res.status(STATUS_CODES.OK).json(payload);
   } catch (err) {
     console.log(err.message);
-    return res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json(ERROR_MESSAGES.REGISTRATION_FAILED);
+    return res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(ERROR_MESSAGES.REGISTRATION_FAILED);
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body;
+
+    // validate request body
+    if (!email || !oldPassword || !newPassword) {
+      return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
+    }
+
+    // check if user exists
+    const user = await userDao.getUserByEmail(email);
+    if (!user) {
+      return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
+    }
+
+    // verify old password
+    const isPasswordValid = await comparePassword(oldPassword, user.password);
+    if (!isPasswordValid) {
+      return res.status(STATUS_CODES.UNAUTHORIZED).json(ERROR_MESSAGES.INVALID_CREDENTIALS);
+    }
+
+    // hash new password
+    const hashedPassword = await hashPassword(newPassword);
+
+    // update password
+    await userDao.updateUser(user.id, { password: hashedPassword });
+
+    res.status(STATUS_CODES.OK).json({
+      message: 'Password reset successfully',
+    });
+  } catch (error) {
+    console.error('Password reset error:', error);
+    res.status(STATUS_CODES.INTERNAL_SERVER_ERROR).json(ERROR_MESSAGES.PASSWORD_RESET_FAILED);
   }
 };
 
 module.exports = {
   login,
   register,
+  resetPassword,
 };

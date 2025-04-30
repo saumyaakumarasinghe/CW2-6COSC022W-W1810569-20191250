@@ -6,4 +6,6 @@ authRoutes.post('/register', authService.register);
 
 authRoutes.post('/login', authService.login);
 
+authRoutes.post('/reset-password', authService.resetPassword);
+
 module.exports = authRoutes;
