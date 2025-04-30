@@ -1,8 +1,6 @@
-const { ROLE } = require('../constants');
-const userDao = require('../dao/user.dao');
-const { hashPassword, comparePassword } = require('./password.service');
-const { generateToken, verifyToken } = require('./token.service');
-const { updateUser } = require('../dao/user.dao');
+const userDao = require('../services/user.service');
+const { hashPassword, comparePassword } = require('../services/password.service');
+const { generateToken } = require('../services/token.service');
 const { sequelize } = require('../models/index');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 const { STATUS_CODES } = require('../constants/status-code.constants');
@@ -30,7 +28,7 @@ const login = async (req, res) => {
 
     // update last active at
     const now = Date.now();
-    const updatedUser = await updateUser(existUser.id, { now }, transaction);
+    const updatedUser = await userDao.updateUser(existUser.id, { now }, transaction);
 
     // create token
     const tokenPayload = {

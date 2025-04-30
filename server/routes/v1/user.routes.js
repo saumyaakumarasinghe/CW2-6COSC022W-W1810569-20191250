@@ -1,17 +1,17 @@
 const express = require('express');
-const userService = require('../../services/user.service');
+const userController = require('../../controllers/user.controller');
 const userRoutes = express.Router();
 
-userRoutes.post('/', userService.createUser);
+userRoutes.post('/', userController.createUser);
 
-userRoutes.get('/', userService.getAllUsers);
+userRoutes.get('/', userController.getAllUsers);
 
-userRoutes.get('/:id', userService.getSingleUser);
+userRoutes.get('/:id', userController.getSingleUser);
 
-userRoutes.patch('/:id/status', userService.updateStatusUser);
+userRoutes.patch('/:id/status', userController.updateStatusUser);
 
-userRoutes.put('/:id', userService.updateUser);
+userRoutes.put('/:id', userController.updateUser);
 
-userRoutes.delete('/:id', userService.deleteUser);
+userRoutes.delete('/:id', userController.deleteUser);
 
 module.exports = userRoutes;

@@ -1,9 +1,9 @@
 const express = require('express');
-const countryService = require('../../services/country.service');
+const countryController = require('../../controllers/country.controller');
 const countryRoutes = express.Router();
 
-countryRoutes.get('/:countryName', countryService.getCountryByName);
+countryRoutes.get('/:countryName', countryController.getCountryByName);
 
-countryRoutes.get('/', countryService.getAllCountries);
+countryRoutes.get('/', countryController.getAllCountries);
 
 module.exports = countryRoutes;

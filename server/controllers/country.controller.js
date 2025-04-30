@@ -1,6 +1,6 @@
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
-const { getRestCountryByName, getAllRestCountries } = require('./rest-countries.service');
+const { getRestCountryByName, getAllRestCountries } = require('../services/rest-countries.service');
 
 async function getCountryByName(req, res) {
   try {
