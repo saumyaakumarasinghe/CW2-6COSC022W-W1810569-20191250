@@ -1,6 +1,6 @@
 const userDao = require('../services/user.service');
-const { hashPassword, comparePassword } = require('../services/password.service');
-const { generateToken } = require('../services/token.service');
+const { hashPassword, comparePassword } = require('../utils/password.util');
+const { generateToken } = require('../utils/token.util');
 const { sequelize } = require('../models/index');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 const { STATUS_CODES } = require('../constants/status-code.constants');

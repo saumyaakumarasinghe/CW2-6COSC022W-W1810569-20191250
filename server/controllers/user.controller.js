@@ -1,5 +1,5 @@
 const userDao = require('../services/user.service');
-const { hashPassword } = require('../services/password.service');
+const { hashPassword } = require('../utils/password.util');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 

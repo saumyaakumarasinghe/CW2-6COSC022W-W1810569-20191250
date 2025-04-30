@@ -1,5 +1,5 @@
 const { STATUS_CODES } = require('../constants/status-code.constants');
-const { authenticateToken } = require('../services/token.service');
+const { authenticateToken } = require('../utils/token.util');
 
 const checkAuth = async (req, res, next) => {
   try {
