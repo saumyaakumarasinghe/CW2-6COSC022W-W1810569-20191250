@@ -1,19 +1,13 @@
-const {
-  User,
-  ApiKey,
-  ApiKeyInteraction,
-  sequelize,
-} = require('../models/index');
+const { User, sequelize } = require('../models/index');
 
-async function createUser(firstName, lastName, email, mobile, password, role) {
+async function createUser(userName, email, mobile, password, is_subscribed) {
   try {
     return User.create({
-      firstName,
-      lastName,
+      userName,
       email,
       mobile,
       password,
-      role,
+      is_subscribed,
       lastActivateAt: Date.now(),
       status: true,
     });
@@ -34,6 +28,8 @@ async function getAllUsers() {
 
 async function getUserById(userId) {
   try {
+    console.log(userId);
+
     return User.findOne({
       where: { id: userId },
     });
@@ -70,26 +66,6 @@ async function updateUser(userId, userData) {
 async function deleteUser(userId) {
   const transaction = await sequelize.transaction();
   try {
-    // Find all API keys associated with this user
-    const apiKeys = await ApiKey.findAll({
-      where: { userId },
-      transaction,
-    });
-
-    // For each API key, delete its interactions
-    for (const apiKey of apiKeys) {
-      await ApiKeyInteraction.destroy({
-        where: { apiKeyId: apiKey.id },
-        transaction,
-      });
-    }
-
-    // Delete all API keys for this user
-    await ApiKey.destroy({
-      where: { userId },
-      transaction,
-    });
-
     // Delete the user
     const result = await User.destroy({
       where: { id: userId },
