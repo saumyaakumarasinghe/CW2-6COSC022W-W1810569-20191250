@@ -43,8 +43,8 @@ TravelTales allows users to write blog posts about their travel experiences, enr
 - ✅ User registration and authentication (JWT coming soon)
 - ✅ SQLite database
 - ✅ Color-coded dev logs using `concurrently`
-- ⏳ Swagger API docs *(in progress)*
-- ⏳ Docker support *(in progress)*
+- ⏳ Swagger API docs _(in progress)_
+- ⏳ Docker support _(in progress)_
 
 ---
 
@@ -63,7 +63,6 @@ TravelTales allows users to write blog posts about their travel experiences, enr
 ├── client/          # Next.js frontend
 └── server/          # Node.js backend API
 ```
-
 
 ---
 
