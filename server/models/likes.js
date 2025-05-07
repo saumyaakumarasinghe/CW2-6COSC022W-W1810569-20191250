@@ -20,14 +20,15 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Likes.associate = (models) => {
-    Likes.belongsTo(models.Users, {
+    Likes.belongsTo(models.users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
 
-    Likes.belongsTo(models.BlogPosts, {
+    Likes.belongsTo(models.blog_posts, {
       foreignKey: 'postId',
       onDelete: 'CASCADE',
+      as: 'post',
     });
   };
 

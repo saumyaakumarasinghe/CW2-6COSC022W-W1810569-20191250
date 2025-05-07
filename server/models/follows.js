@@ -20,13 +20,13 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Follows.associate = (models) => {
-    Follows.belongsTo(models.Users, {
+    Follows.belongsTo(models.users, {
       foreignKey: 'followerId',
       as: 'Follower',
       onDelete: 'CASCADE',
     });
 
-    Follows.belongsTo(models.Users, {
+    Follows.belongsTo(models.users, {
       foreignKey: 'followedId',
       as: 'Followed',
       onDelete: 'CASCADE',

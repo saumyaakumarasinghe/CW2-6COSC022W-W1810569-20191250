@@ -28,11 +28,11 @@ module.exports = (sequelize, DataTypes) => {
   );
 
   Comments.associate = (models) => {
-    Comments.belongsTo(models.Users, {
+    Comments.belongsTo(models.users, {
       foreignKey: 'userId',
       onDelete: 'CASCADE',
     });
-    Comments.belongsTo(models.BlogPosts, {
+    Comments.belongsTo(models.blog_posts, {
       foreignKey: 'postId',
       onDelete: 'CASCADE',
     });
