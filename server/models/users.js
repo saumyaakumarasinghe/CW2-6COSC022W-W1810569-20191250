@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const Users = sequelize.define('users', {
     userName: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -27,12 +27,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    is_subscribed: {
+    isSubscribed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false,
     },
   });
 
-  return User;
+  return Users;
 };
