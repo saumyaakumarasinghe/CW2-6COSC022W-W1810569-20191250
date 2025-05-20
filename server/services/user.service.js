@@ -1,6 +1,6 @@
 const { users: Users, sequelize } = require('../models/index');
 
-async function createUser(userName, email, mobile, password, isSubscribed, firstName, lastName) {
+async function createUser(userName, email, mobile, password, firstName, lastName) {
   try {
     return Users.create({
       userName,
@@ -9,7 +9,6 @@ async function createUser(userName, email, mobile, password, isSubscribed, first
       email,
       mobile,
       password,
-      isSubscribed,
       lastActivateAt: Date.now(),
       status: true,
     });

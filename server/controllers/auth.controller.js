@@ -63,7 +63,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    let { userName, firstName, lastName, email, mobile, password, is_subscribed } = req.body;
+    let { userName, firstName, lastName, email, mobile, password } = req.body;
 
     // validate request body
     if (!userName || !email || !mobile || !password || !firstName || !lastName) {
@@ -79,12 +79,11 @@ const register = async (req, res) => {
 
     const user = await userService.createUser(
       userName,
-      firstName,
-      lastName,
       email,
       mobile,
       password,
-      is_subscribed
+      firstName,
+      lastName
     );
 
     const payload = {
