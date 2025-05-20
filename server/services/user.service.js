@@ -4,14 +4,14 @@ async function createUser(userName, email, mobile, password, isSubscribed, first
   try {
     return Users.create({
       userName,
+      firstName,
+      lastName,
       email,
       mobile,
       password,
       isSubscribed,
       lastActivateAt: Date.now(),
       status: true,
-      firstName,
-      lastName,
     });
   } catch (error) {
     console.error('Error creating user:', error);
