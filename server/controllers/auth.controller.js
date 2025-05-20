@@ -1,4 +1,4 @@
-const userDao = require('../services/user.service');
+const userService = require('../services/user.service');
 const { hashPassword, comparePassword } = require('../utils/password.util');
 const { generateToken } = require('../utils/token.util');
 const { sequelize } = require('../models/index');
@@ -16,7 +16,7 @@ const login = async (req, res) => {
     }
 
     // check if user exists
-    const existUser = await userDao.getUserByEmail(email);
+    const existUser = await userService.getUserByEmail(email);
     if (!existUser) return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
 
     if (existUser.status === false)
@@ -28,7 +28,7 @@ const login = async (req, res) => {
 
     // update last active at
     const now = Date.now();
-    const updatedUser = await userDao.updateUser(existUser.id, { now }, transaction);
+    const updatedUser = await userService.updateUser(existUser.id, { now }, transaction);
 
     // create token
     const tokenPayload = {
@@ -70,13 +70,13 @@ const register = async (req, res) => {
     }
 
     // check email already exist
-    const existUser = await userDao.getUserByEmail(email);
+    const existUser = await userService.getUserByEmail(email);
     if (existUser)
       return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_ALREADY_EXISTS);
 
     password = await hashPassword(password);
 
-    const user = await userDao.createUser(userName, email, mobile, password, is_subscribed);
+    const user = await userService.createUser(userName, email, mobile, password, is_subscribed);
 
     const payload = {
       userId: user.id,
@@ -98,7 +98,7 @@ const resetPassword = async (req, res) => {
     }
 
     // check if user exists
-    const user = await userDao.getUserByEmail(email);
+    const user = await userService.getUserByEmail(email);
     if (!user) {
       return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
     }
@@ -113,7 +113,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     // update password
-    await userDao.updateUser(user.id, { password: hashedPassword });
+    await userService.updateUser(user.id, { password: hashedPassword });
 
     res.status(STATUS_CODES.OK).json({
       message: 'Password reset successfully',
