@@ -40,7 +40,7 @@ async function getAllBlogPosts(search_key, sort_by, limit, skip) {
       include: [
         {
           model: users,
-          attributes: ['id', 'userName', 'email'],
+          attributes: ['id', 'firstName', 'lastName', 'userName', 'email'],
           as: 'user',
         },
       ],
