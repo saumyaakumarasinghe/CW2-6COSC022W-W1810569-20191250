@@ -26,6 +26,7 @@ const toggleLike = async (req, res) => {
 const getPostLikes = async (req, res) => {
   try {
     const { postId } = req.params;
+    const currentUserId = req.user?.userId; // Get current user ID if authenticated
 
     if (!postId) {
       return res
@@ -33,25 +34,11 @@ const getPostLikes = async (req, res) => {
         .json({ error: ERROR_MESSAGES.INVALID_REQUEST_PARAMS });
     }
 
-    // const likes = await likeService.getPostLikes(postId);
-    const likes = 10;
-    res.status(STATUS_CODES.OK).json({ message: 'Post likes retrieved successfully', likes });
+    const likes = await likeService.getPostLikes(postId, currentUserId);
+
+    res.status(STATUS_CODES.OK).json(likes);
   } catch (err) {
     console.error('Error fetching post likes:', err.message);
-    res
-      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json({ error: err.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR });
-  }
-};
-
-const toggleDislike = async (req, res) => {
-  try {
-    const { userId } = req.user;
-
-    const likes = await likeService.getUserLikes(userId);
-    res.status(STATUS_CODES.OK).json({ message: 'User likes retrieved successfully', likes });
-  } catch (err) {
-    console.error('Error fetching user likes:', err.message);
     res
       .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
       .json({ error: err.message || ERROR_MESSAGES.INTERNAL_SERVER_ERROR });
@@ -61,5 +48,4 @@ const toggleDislike = async (req, res) => {
 module.exports = {
   toggleLike,
   getPostLikes,
-  toggleDislike,
 };
