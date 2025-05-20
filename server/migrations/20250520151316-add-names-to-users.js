@@ -17,5 +17,5 @@ module.exports = {
     await queryInterface.removeColumn('users', 'firstName');
 
     await queryInterface.removeColumn('users', 'lastName');
-  }
+  },
 };
