@@ -51,7 +51,7 @@ export default function Header() {
               {isAuthenticated && user ? (
                 <>
                   <button
-                    onClick={() => router.push(`/profile?user=${user}`)}
+                    onClick={() => router.push(`/profile`)}
                     className="text-sm text-gray-600 hover:text-blue-600 transition-all duration-200 hover:scale-105 hover:bg-blue-50 px-3 py-1.5 rounded-md"
                   >
                     Welcome,{' '}

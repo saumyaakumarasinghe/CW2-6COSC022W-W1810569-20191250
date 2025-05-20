@@ -7,12 +7,11 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { blogService } from '@/services/blogService';
 import { Skeleton } from '@/components/ui/skeleton';
+import Header from '@/components/Header';
 
 const ITEMS_PER_PAGE = 10;
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
-const LOGO_IMAGE =
-  'https://images.unsplash.com/photo-1488085061387-422e29b40080?w=100&h=100&fit=crop&q=60';
 
 // Helper function to get author name
 const getAuthorName = (user: {
@@ -36,7 +35,7 @@ export default function Home() {
 
   // Fetch blog posts using React Query
   const { data: blogData, isLoading } = useQuery({
-    queryKey: ['blogPosts', searchTerm, skip],
+    queryKey: ['blog-post', searchTerm, skip],
     queryFn: () => blogService.getPosts(searchTerm, skip, ITEMS_PER_PAGE),
   });
 
@@ -51,36 +50,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Bar */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-8 py-4">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden">
-                <Image
-                  src={LOGO_IMAGE}
-                  alt="Passport Pages Logo"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-              </div>
-              <span className="text-xl font-bold text-gray-900">Passport Pages</span>
-            </div>
-
-            {/* Login Button */}
-            <Button
-              variant="outline"
-              type="submit"
-              className="hover:bg-gray-50 cursor-pointer"
-              onClick={() => router.push('/login')}
-            >
-              Login
-            </Button>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-8 py-10">

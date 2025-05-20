@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstance from '@/lib/axios';
-import useAuthStore from '@/store/authStore';
+import { useAuthStore } from '@/store/authStore';
 import { AuthResponse, ApiErrorResponse } from '@/types/api';
 import { useRouter } from 'next/navigation';
 
@@ -28,14 +28,7 @@ export function useAuth() {
       return data;
     },
     onSuccess: (data) => {
-      login(
-        {
-          username: data.user.username,
-          email: data.user.email,
-          mobile: data.user.mobile,
-        },
-        data.token
-      );
+      login(data.user.email, data.token);
       router.push('/dashboard');
       clearError();
     },
@@ -51,14 +44,7 @@ export function useAuth() {
       return data;
     },
     onSuccess: (data) => {
-      login(
-        {
-          username: data.user.username,
-          email: data.user.email,
-          mobile: data.user.mobile,
-        },
-        data.token
-      );
+      login(data.user.email, data.token);
       router.push('/dashboard');
       clearError();
     },

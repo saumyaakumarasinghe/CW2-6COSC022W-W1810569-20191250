@@ -35,6 +35,8 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (data: RegisterData) => Promise<void>;
   logout: () => void;
+  setError: (error: string) => void;
+  clearError: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -45,6 +47,9 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
       isLoading: false,
       error: null,
+
+      setError: (error: string) => set({ error }),
+      clearError: () => set({ error: null }),
 
       login: async (email: string, password: string) => {
         try {

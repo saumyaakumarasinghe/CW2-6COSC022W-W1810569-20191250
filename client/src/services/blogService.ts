@@ -48,6 +48,33 @@ export interface Follower {
   avatarUrl?: string;
 }
 
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string;
+    firstName: string | null;
+    lastName: string | null;
+    userName: string;
+  };
+}
+
+export interface CommentResponse {
+  comments: Comment[];
+  total: number;
+}
+
+export interface LikeResponse {
+  totalLikes: number;
+  hasLiked: boolean;
+}
+
+export interface AddCommentRequest {
+  postId: number;
+  content: string;
+}
+
 export const blogService = {
   // Get user profile
   getProfile: async (userId?: string) => {
@@ -82,7 +109,30 @@ export const blogService = {
   },
 
   getPostById: async (id: string) => {
-    const { data } = await axiosInstance.get<BlogPost>(`/blog-post/${id}`);
+    const { data } = await axiosInstance.get<BlogPost>(`/v1/blog-post/${id}`);
+    return data;
+  },
+
+  getComments: async (id: string): Promise<CommentResponse> => {
+    const { data } = await axiosInstance.get<CommentResponse>(`/v1/comment/${id}`);
+    return data;
+  },
+
+  getLikes: async (id: string): Promise<LikeResponse> => {
+    const { data } = await axiosInstance.get<LikeResponse>(`/v1/like/${id}`);
+    return data;
+  },
+
+  toggleLike: async (id: string): Promise<LikeResponse> => {
+    const { data } = await axiosInstance.post<LikeResponse>(`/v1/like/${id}`);
+    return data;
+  },
+
+  addComment: async (postId: string, content: string): Promise<CommentResponse> => {
+    const { data } = await axiosInstance.post<CommentResponse>(`/v1/comment`, {
+      postId: parseInt(postId),
+      content,
+    });
     return data;
   },
 };
