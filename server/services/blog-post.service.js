@@ -37,11 +37,13 @@ async function getAllBlogPosts(search_key, sort_by, limit, skip) {
       limit: parseInt(limit) || 10,
       offset: parseInt(skip) || 0,
       order: [[sort_by || 'createdAt', 'DESC']],
-      include: [{
-        model: users,
-        attributes: ['id', 'userName', 'email'],
-        as: 'user'
-      }]
+      include: [
+        {
+          model: users,
+          attributes: ['id', 'userName', 'email'],
+          as: 'user',
+        },
+      ],
     });
 
     return {
@@ -58,11 +60,13 @@ async function getBlogPostById(postId) {
   try {
     return BlogPosts.findOne({
       where: { id: postId },
-      include: [{
-        model: users,
-        attributes: ['id', 'userName', 'email'],
-        as: 'user'
-      }]
+      include: [
+        {
+          model: users,
+          attributes: ['id', 'userName', 'email'],
+          as: 'user',
+        },
+      ],
     });
   } catch (error) {
     console.error('Error fetching blog post by ID:', error);

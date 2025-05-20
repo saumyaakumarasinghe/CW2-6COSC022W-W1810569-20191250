@@ -47,8 +47,8 @@ const getAllBlogPosts = async (req, res) => {
       total: posts.total,
       posts: posts.posts,
       limit: limit,
-      skip: skip
-    }
+      skip: skip,
+    };
 
     res.status(STATUS_CODES.OK).json(payload);
   } catch (err) {
