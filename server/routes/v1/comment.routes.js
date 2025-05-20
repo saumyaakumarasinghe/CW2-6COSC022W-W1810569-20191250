@@ -6,8 +6,8 @@ const { checkAuth } = require('../../middleware/check-token.middleware');
 
 commentRoutes.post('/', checkAuth, commentController.createComment);
 
-commentRoutes.get('/', commentController.getAllComments);
+commentRoutes.get('/:postId', commentController.getAllComments);
 
-commentRoutes.delete('/:id', checkAuth, commentController.deleteComment);
+commentRoutes.delete('/:postId', checkAuth, commentController.deleteComment);
 
 module.exports = commentRoutes;

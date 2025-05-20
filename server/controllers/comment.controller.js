@@ -28,7 +28,7 @@ const createComment = async (req, res) => {
 
 const getAllComments = async (req, res) => {
   try {
-    const { postId } = req.query;
+    const { postId } = req.params;
 
     if (!postId) {
       return res.status(STATUS_CODES.FORBIDDEN).json({ error: 'Post ID is required' });
