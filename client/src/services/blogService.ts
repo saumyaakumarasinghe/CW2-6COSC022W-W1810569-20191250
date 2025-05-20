@@ -131,4 +131,36 @@ export const blogService = {
     });
     return data;
   },
+
+  // Create a new blog post
+  createBlogPost: async (post: {
+    title: string;
+    content: string;
+    country?: string;
+    visitDate?: string | null;
+    coverImage?: string;
+  }): Promise<BlogPost> => {
+    const { data } = await axiosInstance.post<BlogPost>('/v1/blog-post', post);
+    return data;
+  },
+
+  // Update a blog post
+  updateBlogPost: async (
+    id: number,
+    post: {
+      title?: string;
+      content?: string;
+      country?: string;
+      visitDate?: string | null;
+      coverImage?: string;
+    }
+  ): Promise<BlogPost> => {
+    const { data } = await axiosInstance.put<BlogPost>(`/v1/blog-post/${id}`, post);
+    return data;
+  },
+
+  // Delete a blog post
+  deleteBlogPost: async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/v1/blog-post/${id}`);
+  },
 };

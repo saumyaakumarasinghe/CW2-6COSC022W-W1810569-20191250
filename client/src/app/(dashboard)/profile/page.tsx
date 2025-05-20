@@ -1,19 +1,42 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Follower, BlogPost, blogService } from '@/services/blogService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/authStore';
 import Header from '@/components/Header';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Pencil, Trash2 } from 'lucide-react';
 
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
 
 const UserProfilePage = () => {
   const [activeTab, setActiveTab] = useState('posts');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [newPost, setNewPost] = useState({
+    title: '',
+    content: '',
+    country: '',
+    visitDate: '',
+    coverImage: '',
+  });
   const { user } = useAuthStore();
+  const queryClient = useQueryClient();
 
   // Fetch user's posts
   const { data: posts, isLoading: isPostsLoading } = useQuery<BlogPost[]>({
@@ -35,6 +58,54 @@ const UserProfilePage = () => {
     queryFn: () => blogService.getFollowing(),
     enabled: activeTab === 'following',
   });
+
+  const handleCreatePost = async () => {
+    try {
+      await blogService.createBlogPost({
+        ...newPost,
+        visitDate: newPost.visitDate ? new Date(newPost.visitDate).toISOString() : null,
+      });
+      setIsCreateModalOpen(false);
+      setNewPost({
+        title: '',
+        content: '',
+        country: '',
+        visitDate: '',
+        coverImage: '',
+      });
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
+  };
+
+  const handleEditPost = async () => {
+    if (!editingPost) return;
+    try {
+      await blogService.updateBlogPost(editingPost.id, {
+        title: editingPost.title,
+        content: editingPost.content,
+        country: editingPost.country,
+        visitDate: editingPost.visitDate ? new Date(editingPost.visitDate).toISOString() : null,
+        coverImage: editingPost.coverImage || undefined,
+      });
+      setIsEditModalOpen(false);
+      setEditingPost(null);
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    } catch (error) {
+      console.error('Error updating post:', error);
+    }
+  };
+
+  const handleDeletePost = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this post?')) return;
+    try {
+      await blogService.deleteBlogPost(id);
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
 
   if (!user) {
     return (
@@ -152,7 +223,80 @@ const UserProfilePage = () => {
         <div>
           {activeTab === 'posts' && (
             <div className="p-6 bg-white shadow-md rounded-lg">
-              <h2 className="text-2xl font-semibold mb-4">Blog Posts</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-semibold">Blog Posts</h2>
+                <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button>Create New Post</Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px]">
+                    <DialogHeader>
+                      <DialogTitle>Create New Blog Post</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="title">Title</Label>
+                        <Input
+                          id="title"
+                          value={newPost.title}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setNewPost({ ...newPost, title: e.target.value })
+                          }
+                          placeholder="Enter post title"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="content">Content</Label>
+                        <Textarea
+                          id="content"
+                          value={newPost.content}
+                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                            setNewPost({ ...newPost, content: e.target.value })
+                          }
+                          placeholder="Write your post content"
+                          rows={6}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="country">Country</Label>
+                        <Input
+                          id="country"
+                          value={newPost.country}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setNewPost({ ...newPost, country: e.target.value })
+                          }
+                          placeholder="Enter country name"
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="visitDate">Visit Date</Label>
+                        <Input
+                          id="visitDate"
+                          type="date"
+                          value={newPost.visitDate}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setNewPost({ ...newPost, visitDate: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="coverImage">Cover Image URL</Label>
+                        <Input
+                          id="coverImage"
+                          value={newPost.coverImage}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                            setNewPost({ ...newPost, coverImage: e.target.value })
+                          }
+                          placeholder="Enter image URL"
+                        />
+                      </div>
+                      <Button onClick={handleCreatePost} className="mt-4">
+                        Create Post
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
               {isPostsLoading ? (
                 <div className="space-y-4">
                   {[1, 2, 3].map((i) => (
@@ -170,7 +314,28 @@ const UserProfilePage = () => {
                       key={post.id}
                       className="p-4 border rounded-md hover:shadow-md transition-shadow duration-200"
                     >
-                      <h3 className="text-xl font-bold">{post.title}</h3>
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold">{post.title}</h3>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              setEditingPost(post);
+                              setIsEditModalOpen(true);
+                            }}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDeletePost(post.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
                       <p className="text-sm text-gray-500 mb-2">
                         Published on: {new Date(post.createdAt).toLocaleDateString()}
                       </p>
@@ -207,6 +372,78 @@ const UserProfilePage = () => {
               ) : (
                 <p className="text-gray-500">No posts found</p>
               )}
+
+              {/* Edit Post Modal */}
+              <Dialog open={isEditModalOpen} onOpenChange={setIsEditModalOpen}>
+                <DialogContent className="sm:max-w-[600px]">
+                  <DialogHeader>
+                    <DialogTitle>Edit Blog Post</DialogTitle>
+                  </DialogHeader>
+                  {editingPost && (
+                    <div className="grid gap-4 py-4">
+                      <div className="grid gap-2">
+                        <Label htmlFor="edit-title">Title</Label>
+                        <Input
+                          id="edit-title"
+                          value={editingPost.title}
+                          onChange={(e) =>
+                            setEditingPost({ ...editingPost, title: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="edit-content">Content</Label>
+                        <Textarea
+                          id="edit-content"
+                          value={editingPost.content}
+                          onChange={(e) =>
+                            setEditingPost({ ...editingPost, content: e.target.value })
+                          }
+                          rows={6}
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="edit-country">Country</Label>
+                        <Input
+                          id="edit-country"
+                          value={editingPost.country}
+                          onChange={(e) =>
+                            setEditingPost({ ...editingPost, country: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="edit-visitDate">Visit Date</Label>
+                        <Input
+                          id="edit-visitDate"
+                          type="date"
+                          value={
+                            editingPost.visitDate
+                              ? new Date(editingPost.visitDate).toISOString().split('T')[0]
+                              : ''
+                          }
+                          onChange={(e) =>
+                            setEditingPost({ ...editingPost, visitDate: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="grid gap-2">
+                        <Label htmlFor="edit-coverImage">Cover Image URL</Label>
+                        <Input
+                          id="edit-coverImage"
+                          value={editingPost.coverImage || ''}
+                          onChange={(e) =>
+                            setEditingPost({ ...editingPost, coverImage: e.target.value })
+                          }
+                        />
+                      </div>
+                      <Button onClick={handleEditPost} className="mt-4">
+                        Update Post
+                      </Button>
+                    </div>
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           )}
 
