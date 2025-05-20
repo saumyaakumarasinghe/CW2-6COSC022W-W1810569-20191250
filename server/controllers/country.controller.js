@@ -39,13 +39,7 @@ async function getAllCountries(req, res) {
     }
 
     // Map the response to the desired format
-    const payload = countries.map((country) => ({
-      name: country.name?.common || 'N/A',
-      capital: country.capital ? country.capital[0] : 'N/A',
-      currencies: country.currencies ? Object.keys(country.currencies) : [],
-      languages: country.languages ? Object.values(country.languages) : [],
-      flag: country.flags?.svg || country.flags?.png || 'N/A',
-    }));
+    const payload = countries.map((country) => country.name?.common || 'N/A');
 
     res.status(STATUS_CODES.OK).json(payload);
   } catch (err) {
