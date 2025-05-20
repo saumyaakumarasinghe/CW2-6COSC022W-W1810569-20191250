@@ -8,8 +8,8 @@ const likePost = async (userId, postId) => {
       where: {
         id: postId,
         status: 'active',
-        likesEnabled: true
-      }
+        likesEnabled: true,
+      },
     });
 
     if (!post) {
@@ -20,8 +20,8 @@ const likePost = async (userId, postId) => {
     const existingLike = await Likes.findOne({
       where: {
         userId,
-        postId
-      }
+        postId,
+      },
     });
 
     if (existingLike) {
@@ -44,11 +44,13 @@ const getPostLikes = async (postId) => {
   try {
     const likes = await Likes.findAll({
       where: { postId },
-      include: [{
-        model: BlogPosts,
-        as: 'post',
-        attributes: ['id', 'title', 'likes']
-      }]
+      include: [
+        {
+          model: BlogPosts,
+          as: 'post',
+          attributes: ['id', 'title', 'likes'],
+        },
+      ],
     });
     return likes;
   } catch (error) {
@@ -60,11 +62,13 @@ const getUserLikes = async (userId) => {
   try {
     const likes = await Likes.findAll({
       where: { userId },
-      include: [{
-        model: BlogPosts,
-        as: 'post',
-        attributes: ['id', 'title', 'likes']
-      }]
+      include: [
+        {
+          model: BlogPosts,
+          as: 'post',
+          attributes: ['id', 'title', 'likes'],
+        },
+      ],
     });
     return likes;
   } catch (error) {
@@ -75,5 +79,5 @@ const getUserLikes = async (userId) => {
 module.exports = {
   likePost,
   getPostLikes,
-  getUserLikes
-}; 
+  getUserLikes,
+};

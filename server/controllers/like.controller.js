@@ -8,7 +8,9 @@ const toggleLike = async (req, res) => {
     const { userId } = req.user;
 
     if (!postId) {
-      return res.status(STATUS_CODES.FORBIDDEN).json({ error: ERROR_MESSAGES.INVALID_REQUEST_PARAMS });
+      return res
+        .status(STATUS_CODES.FORBIDDEN)
+        .json({ error: ERROR_MESSAGES.INVALID_REQUEST_PARAMS });
     }
 
     const result = await likeService.likePost(userId, postId);
@@ -26,7 +28,9 @@ const getPostLikes = async (req, res) => {
     const { postId } = req.params;
 
     if (!postId) {
-      return res.status(STATUS_CODES.FORBIDDEN).json({ error: ERROR_MESSAGES.INVALID_REQUEST_PARAMS });
+      return res
+        .status(STATUS_CODES.FORBIDDEN)
+        .json({ error: ERROR_MESSAGES.INVALID_REQUEST_PARAMS });
     }
 
     // const likes = await likeService.getPostLikes(postId);
@@ -57,5 +61,5 @@ const toggleDislike = async (req, res) => {
 module.exports = {
   toggleLike,
   getPostLikes,
-  toggleDislike
-}; 
+  toggleDislike,
+};
