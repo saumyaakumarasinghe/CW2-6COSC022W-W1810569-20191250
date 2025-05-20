@@ -66,7 +66,7 @@ const register = async (req, res) => {
     let { userName, firstName, lastName, email, mobile, password, is_subscribed } = req.body;
 
     // validate request body
-    if (!userName || !email || !mobile || !password || !is_subscribed || !firstName || !lastName) {
+    if (!userName || !email || !mobile || !password || !firstName || !lastName) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
