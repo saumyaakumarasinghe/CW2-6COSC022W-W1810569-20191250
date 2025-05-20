@@ -283,4 +283,4 @@ components:
         updatedAt:
           type: string
           format: date-time
-          example: '2024-05-01T12:00:00Z' 
+          example: '2024-05-01T12:00:00Z'
