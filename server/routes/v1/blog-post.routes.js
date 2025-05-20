@@ -8,7 +8,7 @@ blogPosRoutes.post('/', checkAuth, blogPostController.createBlogPost);
 
 blogPosRoutes.get('/', blogPostController.getAllBlogPosts);
 
-blogPosRoutes.get('/:id', checkAuth, blogPostController.getSingleBlogPost);
+blogPosRoutes.get('/:id', blogPostController.getSingleBlogPost);
 
 blogPosRoutes.put('/:id', checkAuth, blogPostController.updateBlogPost);
 
