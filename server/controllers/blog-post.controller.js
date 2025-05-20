@@ -35,7 +35,13 @@ const createBlogPost = async (req, res) => {
 
 const getAllBlogPosts = async (req, res) => {
   try {
-    const posts = await blogPostService.getAllBlogPosts();
+    const { search_key, sort_by } = req.query;
+
+    // Validate sort_by to prevent SQL injection
+    const allowedSortFields = ['createdAt', 'updatedAt', 'title', 'country', 'likes', 'visitDate'];
+    const validatedSortBy = allowedSortFields.includes(sort_by) ? sort_by : 'createdAt';
+
+    const posts = await blogPostService.getAllBlogPosts(search_key, validatedSortBy);
 
     res.status(STATUS_CODES.OK).json(posts);
   } catch (err) {

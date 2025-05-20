@@ -2,14 +2,16 @@ const express = require('express');
 const blogPostController = require('../../controllers/blog-post.controller');
 const blogPosRoutes = express.Router();
 
-blogPosRoutes.post('/', blogPostController.createBlogPost);
+const { checkAuth } = require('../../middleware/check-token.middleware');
+
+blogPosRoutes.post('/', checkAuth, blogPostController.createBlogPost);
 
 blogPosRoutes.get('/', blogPostController.getAllBlogPosts);
 
-blogPosRoutes.get('/:id', blogPostController.getSingleBlogPost);
+blogPosRoutes.get('/:id', checkAuth, blogPostController.getSingleBlogPost);
 
-blogPosRoutes.put('/:id', blogPostController.updateBlogPost);
+blogPosRoutes.put('/:id', checkAuth, blogPostController.updateBlogPost);
 
-blogPosRoutes.delete('/:id', blogPostController.deleteBlogPost);
+blogPosRoutes.delete('/:id', checkAuth, blogPostController.deleteBlogPost);
 
 module.exports = blogPosRoutes;

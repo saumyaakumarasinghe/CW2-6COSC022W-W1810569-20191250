@@ -11,7 +11,7 @@ module.exports = {
       title: { type: Sequelize.STRING, allowNull: false },
       content: { type: Sequelize.TEXT, allowNull: false },
       country: { type: Sequelize.STRING, allowNull: false },
-      visitSate: { type: Sequelize.DATE, allowNull: true },
+      visitDate: { type: Sequelize.DATE, allowNull: true },
       coverImage: { type: Sequelize.STRING, allowNull: true },
       likes: { type: Sequelize.INTEGER, defaultValue: 0 },
       status: { type: Sequelize.ENUM('active', 'deleted', 'hidden'), defaultValue: 'active' },
