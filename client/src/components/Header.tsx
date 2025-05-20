@@ -12,7 +12,7 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    router.push('/login');
+    router.push('/');
   };
 
   const getUserDisplayName = () => {
@@ -69,7 +69,7 @@ export default function Header() {
                 <Button
                   variant="outline"
                   className="hover:bg-gray-50 hover:scale-105 hover:shadow-md transition-all duration-200 cursor-pointer"
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/login')}
                 >
                   Login
                 </Button>
