@@ -163,4 +163,9 @@ export const blogService = {
   deleteBlogPost: async (id: number): Promise<void> => {
     await axiosInstance.delete(`/v1/blog-post/${id}`);
   },
+
+  getCountries: async (): Promise<string[]> => {
+    const { data } = await axiosInstance.get<string[]>('/v1/country/');
+    return data;
+  },
 };

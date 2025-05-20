@@ -19,6 +19,13 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Pencil, Trash2 } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
@@ -37,6 +44,12 @@ const UserProfilePage = () => {
   });
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
+
+  // Fetch countries
+  const { data: countries, isLoading: isCountriesLoading } = useQuery<string[]>({
+    queryKey: ['countries'],
+    queryFn: () => blogService.getCountries(),
+  });
 
   // Fetch user's posts
   const { data: posts, isLoading: isPostsLoading } = useQuery<BlogPost[]>({
@@ -259,14 +272,29 @@ const UserProfilePage = () => {
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="country">Country</Label>
-                        <Input
-                          id="country"
+                        <Select
                           value={newPost.country}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            setNewPost({ ...newPost, country: e.target.value })
+                          onValueChange={(value: string) =>
+                            setNewPost({ ...newPost, country: value })
                           }
-                          placeholder="Enter country name"
-                        />
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {isCountriesLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading countries...
+                              </SelectItem>
+                            ) : (
+                              countries?.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="visitDate">Visit Date</Label>
@@ -404,13 +432,29 @@ const UserProfilePage = () => {
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="edit-country">Country</Label>
-                        <Input
-                          id="edit-country"
+                        <Select
                           value={editingPost.country}
-                          onChange={(e) =>
-                            setEditingPost({ ...editingPost, country: e.target.value })
+                          onValueChange={(value: string) =>
+                            setEditingPost({ ...editingPost, country: value })
                           }
-                        />
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a country" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {isCountriesLoading ? (
+                              <SelectItem value="loading" disabled>
+                                Loading countries...
+                              </SelectItem>
+                            ) : (
+                              countries?.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div className="grid gap-2">
                         <Label htmlFor="edit-visitDate">Visit Date</Label>
