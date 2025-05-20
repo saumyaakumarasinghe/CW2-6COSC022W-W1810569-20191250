@@ -1,4 +1,5 @@
-const { BlogPosts, sequelize } = require('../models/index');
+const { blog_posts: BlogPosts, sequelize } = require('../models/index');
+const { Op } = require('sequelize');
 
 async function createBlogPost({ userId, title, content, country, visitDate, coverImage }) {
   try {
@@ -20,9 +21,26 @@ async function createBlogPost({ userId, title, content, country, visitDate, cove
   }
 }
 
-async function getAllBlogPosts() {
+async function getAllBlogPosts(search_key, sort_by) {
   try {
-    return await BlogPosts.findAll();
+    const whereClause = {};
+    if (search_key) {
+      whereClause[Op.or] = [
+        { title: { [Op.like]: `%${search_key}%` } },
+        { content: { [Op.like]: `%${search_key}%` } },
+        { country: { [Op.like]: `%${search_key}%` } },
+      ];
+    }
+
+    const { count, rows } = await BlogPosts.findAndCountAll({
+      where: whereClause,
+      order: [[sort_by, 'DESC']],
+    });
+
+    return {
+      total: count,
+      posts: rows,
+    };
   } catch (error) {
     console.error('Error fetching blog posts:', error);
     throw error;
@@ -31,7 +49,7 @@ async function getAllBlogPosts() {
 
 async function getBlogPostById(postId) {
   try {
-    return await BlogPosts.findOne({
+    return BlogPosts.findOne({
       where: { id: postId },
     });
   } catch (error) {
@@ -43,7 +61,8 @@ async function getBlogPostById(postId) {
 async function updateBlogPost(postId, updateData) {
   try {
     await BlogPosts.update(updateData, { where: { id: postId } });
-    return await getBlogPostById(postId);
+
+    return getBlogPostById(postId);
   } catch (error) {
     console.error('Error updating blog post:', error);
     throw error;
@@ -56,6 +75,7 @@ async function deleteBlogPost(postId) {
       where: { id: postId },
       transaction,
     });
+
     return result;
   } catch (error) {
     console.error('Error deleting blog post:', error);

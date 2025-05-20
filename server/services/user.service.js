@@ -1,4 +1,4 @@
-const { Users, sequelize } = require('../models/index');
+const { users: Users, sequelize } = require('../models/index');
 
 async function createUser(userName, email, mobile, password, isSubscribed) {
   try {
