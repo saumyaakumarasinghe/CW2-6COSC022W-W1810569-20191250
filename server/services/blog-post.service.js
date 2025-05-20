@@ -73,7 +73,6 @@ async function deleteBlogPost(postId) {
   try {
     const result = await BlogPosts.destroy({
       where: { id: postId },
-      transaction,
     });
 
     return result;
