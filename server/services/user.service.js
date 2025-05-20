@@ -1,6 +1,6 @@
 const { users: Users, sequelize } = require('../models/index');
 
-async function createUser(userName, email, mobile, password, isSubscribed) {
+async function createUser(userName, email, mobile, password, isSubscribed, firstName, lastName) {
   try {
     return Users.create({
       userName,
@@ -10,6 +10,8 @@ async function createUser(userName, email, mobile, password, isSubscribed) {
       isSubscribed,
       lastActivateAt: Date.now(),
       status: true,
+      firstName,
+      lastName,
     });
   } catch (error) {
     console.error('Error creating user:', error);

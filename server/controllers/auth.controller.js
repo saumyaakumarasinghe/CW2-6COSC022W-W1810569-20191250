@@ -62,10 +62,10 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    let { userName, email, mobile, password, is_subscribed } = req.body;
+    let { userName, firstName, lastName, email, mobile, password, is_subscribed } = req.body;
 
     // validate request body
-    if (!userName || !email || !mobile || !password || !is_subscribed) {
+    if (!userName || !email || !mobile || !password || !is_subscribed || !firstName || !lastName) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
@@ -76,7 +76,15 @@ const register = async (req, res) => {
 
     password = await hashPassword(password);
 
-    const user = await userService.createUser(userName, email, mobile, password, is_subscribed);
+    const user = await userService.createUser(
+      userName,
+      firstName,
+      lastName,
+      email,
+      mobile,
+      password,
+      is_subscribed
+    );
 
     const payload = {
       userId: user.id,
