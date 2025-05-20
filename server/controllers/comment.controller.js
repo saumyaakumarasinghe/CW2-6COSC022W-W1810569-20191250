@@ -34,9 +34,7 @@ const getAllComments = async (req, res) => {
       return res.status(STATUS_CODES.FORBIDDEN).json({ error: 'Post ID is required' });
     }
 
-    const comments = await commentService.getAllComments(
-      postId,
-    );
+    const comments = await commentService.getAllComments(postId);
 
     const payload = {
       total: comments.total,
