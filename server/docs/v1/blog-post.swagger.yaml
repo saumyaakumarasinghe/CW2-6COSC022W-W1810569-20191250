@@ -1,0 +1,286 @@
+paths:
+  /api/v1/blog-post:
+    post:
+      tags:
+        - Blog Post
+      summary: Create a new blog post
+      description: Creates a new blog post in the system.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My Trip to Paris
+                content:
+                  type: string
+                  example: Had an amazing time exploring the Eiffel Tower...
+                country:
+                  type: string
+                  example: France
+                visitDate:
+                  type: string
+                  format: date
+                  example: '2024-05-01'
+                coverImage:
+                  type: string
+                  example: 'https://example.com/image.jpg'
+                commentsEnabled:
+                  type: boolean
+                  example: true
+                likesEnabled:
+                  type: boolean
+                  example: true
+      responses:
+        201:
+          description: Blog post created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        401:
+          description: Unauthorized. Missing or invalid JWT token.
+        403:
+          description: Invalid request body properties.
+        500:
+          description: Internal server error.
+
+    get:
+      tags:
+        - Blog Post
+      summary: Get all blog posts
+      description: Retrieves a list of all blog posts with optional filtering and pagination.
+      parameters:
+        - name: search_key
+          in: query
+          description: Search term for title, content, or country
+          schema:
+            type: string
+        - name: sort_by
+          in: query
+          description: Field to sort by (createdAt, updatedAt, title, country, likes, visitDate)
+          schema:
+            type: string
+            enum: [createdAt, updatedAt, title, country, likes, visitDate]
+        - name: limit
+          in: query
+          description: Number of posts to return
+          schema:
+            type: integer
+            default: 10
+        - name: skip
+          in: query
+          description: Number of posts to skip
+          schema:
+            type: integer
+            default: 0
+      responses:
+        200:
+          description: List of blog posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    example: 50
+                  posts:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/BlogPost'
+                  limit:
+                    type: integer
+                    example: 10
+                  skip:
+                    type: integer
+                    example: 0
+        500:
+          description: Internal server error.
+
+  /api/v1/blog-post/{id}:
+    get:
+      tags:
+        - Blog Post
+      summary: Get a single blog post
+      description: Retrieves a blog post by its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Blog post retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        404:
+          description: Blog post not found.
+        500:
+          description: Internal server error.
+
+    put:
+      tags:
+        - Blog Post
+      summary: Update a blog post
+      description: Updates a blog post's details. Only the post owner can update it.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: My Trip to Paris
+                content:
+                  type: string
+                  example: Had an amazing time exploring the Eiffel Tower...
+                country:
+                  type: string
+                  example: France
+                visitDate:
+                  type: string
+                  format: date
+                  example: '2024-05-01'
+                coverImage:
+                  type: string
+                  example: 'https://example.com/image.jpg'
+                commentsEnabled:
+                  type: boolean
+                  example: true
+                likesEnabled:
+                  type: boolean
+                  example: true
+      responses:
+        200:
+          description: Blog post updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BlogPost'
+        401:
+          description: Unauthorized. Missing or invalid JWT token.
+        403:
+          description: Not authorized to update this post.
+        404:
+          description: Blog post not found.
+        500:
+          description: Internal server error.
+
+    delete:
+      tags:
+        - Blog Post
+      summary: Delete a blog post
+      description: Deletes a blog post. Only the post owner can delete it.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Blog post deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Blog post deleted successfully
+        401:
+          description: Unauthorized. Missing or invalid JWT token.
+        403:
+          description: Not authorized to delete this post.
+        404:
+          description: Blog post not found.
+        500:
+          description: Internal server error.
+
+components:
+  schemas:
+    BlogPost:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: My Trip to Paris
+        content:
+          type: string
+          example: Had an amazing time exploring the Eiffel Tower...
+        country:
+          type: string
+          example: France
+        visitDate:
+          type: string
+          format: date
+          example: '2024-05-01'
+        coverImage:
+          type: string
+          example: 'https://example.com/image.jpg'
+        likes:
+          type: integer
+          example: 0
+        status:
+          type: string
+          enum: [active, deleted, hidden]
+          example: active
+        commentsEnabled:
+          type: boolean
+          example: true
+        likesEnabled:
+          type: boolean
+          example: true
+        userId:
+          type: integer
+          example: 1
+        user:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            userName:
+              type: string
+              example: john_doe
+            firstName:
+              type: string
+              example: John
+            lastName:
+              type: string
+              example: Doe
+            email:
+              type: string
+              example: john@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-05-01T12:00:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-05-01T12:00:00Z' 
