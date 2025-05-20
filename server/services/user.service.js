@@ -69,7 +69,6 @@ async function deleteUser(userId) {
     // Delete the user
     const result = await Users.destroy({
       where: { id: userId },
-      transaction,
     });
 
     return result;
