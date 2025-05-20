@@ -42,10 +42,12 @@ export interface UserProfile {
 }
 
 export interface Follower {
-  id: string;
-  name: string;
-  username: string;
-  avatarUrl?: string;
+  id: number;
+  userName: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  followedAt: string;
 }
 
 export interface Comment {
@@ -76,14 +78,6 @@ export interface AddCommentRequest {
 }
 
 export const blogService = {
-  // Get user profile
-  getProfile: async (userId?: string) => {
-    const { data } = await axiosInstance.get<UserProfile>(
-      userId ? `/users/${userId}/profile` : '/users/profile'
-    );
-    return data;
-  },
-
   // Get user's blog posts
   getPosts: async (searchKey: string = '', skip: number = 0, limit: number = 10) => {
     const { data } = await axiosInstance.get<BlogPostResponse>('/v1/blog-post', {
@@ -92,19 +86,21 @@ export const blogService = {
     return data;
   },
 
+  // Get user's posts
+  getUserPosts: async (): Promise<BlogPost[]> => {
+    const { data } = await axiosInstance.get<BlogPost[]>(`/v1/blog-post/user`);
+    return data;
+  },
+
   // Get user's followers
-  getFollowers: async (userId?: string) => {
-    const { data } = await axiosInstance.get<Follower[]>(
-      userId ? `/users/${userId}/followers` : '/users/followers'
-    );
+  getFollowers: async () => {
+    const { data } = await axiosInstance.get<Follower[]>(`/v1/follow/followers`);
     return data;
   },
 
   // Get users that the user is following
-  getFollowing: async (userId?: string) => {
-    const { data } = await axiosInstance.get<Follower[]>(
-      userId ? `/users/${userId}/following` : '/users/following'
-    );
+  getFollowing: async () => {
+    const { data } = await axiosInstance.get<Follower[]>(`/v1/follow/following`);
     return data;
   },
 
