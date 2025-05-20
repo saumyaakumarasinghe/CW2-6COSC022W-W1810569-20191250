@@ -14,6 +14,7 @@ const toggleLike = async (req, res) => {
     }
 
     const result = await likeService.likePost(userId, postId);
+
     res.status(STATUS_CODES.OK).json(result);
   } catch (err) {
     console.error('Error toggling like:', err.message);

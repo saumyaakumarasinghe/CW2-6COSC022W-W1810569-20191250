@@ -14,6 +14,6 @@ routesV1.use('/user', checkAuth, userRoutes);
 routesV1.use('/country', checkAuth, countryRoutes);
 routesV1.use('/blog-post', blogPostRoutes);
 routesV1.use('/comment', commentRoutes);
-routesV1.use('/post', likeRoutes);
+routesV1.use('/like', likeRoutes);
 
 module.exports = routesV1;
