@@ -53,18 +53,20 @@ const getPostLikes = async (postId, currentUserId) => {
     }
 
     // Check if current user has liked this post
-    const hasLiked = currentUserId
-      ? await Likes.findOne({
-          where: {
-            userId: currentUserId,
-            postId,
-          },
-        })
-      : false;
+    let hasLiked = false;
+    if (currentUserId) {
+      const userLike = await Likes.findOne({
+        where: {
+          userId: currentUserId,
+          postId,
+        },
+      });
+      hasLiked = !!userLike;
+    }
 
     return {
       totalLikes: post.likes,
-      hasLiked: !!hasLiked,
+      hasLiked,
     };
   } catch (error) {
     throw error;

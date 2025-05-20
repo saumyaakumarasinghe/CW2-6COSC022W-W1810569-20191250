@@ -8,6 +8,8 @@ const { checkAuth } = require('../../middleware/check-token.middleware');
 router.post('/:postId', checkAuth, likeController.toggleLike);
 
 // Get likes for a specific post
-router.get('/:postId', likeController.getPostLikes);
+router.get('/:postId', checkAuth, likeController.getPostLikes);
+
+router.get('/public/:postId', likeController.getPostLikes);
 
 module.exports = router;

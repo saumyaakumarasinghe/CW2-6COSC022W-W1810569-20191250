@@ -25,6 +25,7 @@ const ERROR_MESSAGES = {
   LIKE_FETCH_FAILED: 'Failed to fetch likes',
   POST_NOT_FOUND: 'Post not found',
   LIKES_DISABLED: 'Likes are disabled for this post',
+  CANNOT_FOLLOW_SELF: 'You cannot follow yourself',
 };
 
 module.exports = { ERROR_MESSAGES };

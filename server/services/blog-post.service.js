@@ -56,6 +56,17 @@ async function getAllBlogPosts(search_key, sort_by, limit, skip) {
   }
 }
 
+async function getBlogPostsByUserId(userId) {
+  try {
+    return BlogPosts.findAll({
+      where: { userId: userId },
+    });
+  } catch (error) {
+    console.error('Error fetching blog post by ID:', error);
+    throw error;
+  }
+}
+
 async function getBlogPostById(postId) {
   try {
     return BlogPosts.findOne({
@@ -101,6 +112,7 @@ async function deleteBlogPost(postId) {
 module.exports = {
   createBlogPost,
   getAllBlogPosts,
+  getBlogPostsByUserId,
   getBlogPostById,
   updateBlogPost,
   deleteBlogPost,
