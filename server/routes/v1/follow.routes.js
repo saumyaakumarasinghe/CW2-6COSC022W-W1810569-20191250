@@ -14,4 +14,4 @@ router.get('/followers', followController.getFollowers);
 // Get following and followers count
 router.get('/stats', followController.getFollowStats);
 
-module.exports = router; 
+module.exports = router;

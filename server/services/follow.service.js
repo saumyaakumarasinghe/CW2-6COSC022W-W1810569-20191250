@@ -52,7 +52,7 @@ const getFollowing = async (userId) => {
       ],
     });
 
-    return following.map(follow => ({
+    return following.map((follow) => ({
       id: follow.Followed.id,
       userName: follow.Followed.userName,
       firstName: follow.Followed.firstName,
@@ -78,7 +78,7 @@ const getFollowers = async (userId) => {
       ],
     });
 
-    return followers.map(follow => ({
+    return followers.map((follow) => ({
       id: follow.Follower.id,
       userName: follow.Follower.userName,
       firstName: follow.Follower.firstName,
@@ -115,4 +115,4 @@ module.exports = {
   getFollowing,
   getFollowers,
   getFollowStats,
-}; 
+};

@@ -8,9 +8,7 @@ const toggleFollow = async (req, res) => {
     const { followedId } = req.params;
 
     if (!followedId) {
-      return res
-        .status(STATUS_CODES.FORBIDDEN)
-        .json(ERROR_MESSAGES.INVALID_REQUEST_PARAMS);
+      return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.INVALID_REQUEST_PARAMS);
     }
 
     const result = await followService.toggleFollow(userId, parseInt(followedId));
@@ -72,4 +70,4 @@ module.exports = {
   getFollowing,
   getFollowers,
   getFollowStats,
-}; 
+};
