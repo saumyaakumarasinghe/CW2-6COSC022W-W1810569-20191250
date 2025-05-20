@@ -6,10 +6,12 @@ const authRoutes = require('./auth.routes');
 const userRoutes = require('./user.routes');
 const countryRoutes = require('./country.routes');
 const blogPostRoutes = require('./blog-post.routes');
+const commentRoutes = require('./comment.routes');
 
 routesV1.use('/oauth', authRoutes);
 routesV1.use('/user', checkAuth, userRoutes);
 routesV1.use('/country', checkAuth, countryRoutes);
 routesV1.use('/blog-post', blogPostRoutes);
+routesV1.use('/comment', commentRoutes);
 
 module.exports = routesV1;
