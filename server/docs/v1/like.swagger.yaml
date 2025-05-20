@@ -1,0 +1,243 @@
+paths:
+  /api/v1/blog-post/{id}/like:
+    post:
+      tags:
+        - Likes
+      summary: Toggle like/unlike for a blog post
+      description: Likes or unlikes a blog post based on the current like status.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+      responses:
+        200:
+          description: Like status toggled successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Successfully liked post'
+                  isLiked:
+                    type: boolean
+                    example: true
+                  likesCount:
+                    type: integer
+                    example: 42
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/blog-post/{id}/likes:
+    get:
+      tags:
+        - Likes
+      summary: Get users who liked a blog post
+      description: Retrieves a list of users who have liked a specific blog post.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of users to return
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of users to skip
+      responses:
+        200:
+          description: Liked users list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 10
+                  skip:
+                    type: integer
+                    example: 0
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/blog-post/{id}/like/status:
+    get:
+      tags:
+        - Likes
+      summary: Get like status for a blog post
+      description: Checks if the authenticated user has liked a specific blog post.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+      responses:
+        200:
+          description: Like status retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isLiked:
+                    type: boolean
+                    example: true
+                  likesCount:
+                    type: integer
+                    example: 42
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          example: 'USER'
+        status:
+          type: boolean
+          example: true
+        lastActivateAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
