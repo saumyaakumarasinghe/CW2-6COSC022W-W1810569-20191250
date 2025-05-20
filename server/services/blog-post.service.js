@@ -63,7 +63,7 @@ async function getBlogPostById(postId) {
       include: [
         {
           model: users,
-          attributes: ['id', 'userName', 'email'],
+          attributes: ['id', 'firstName', 'lastName', 'userName', 'email'],
           as: 'user',
         },
       ],

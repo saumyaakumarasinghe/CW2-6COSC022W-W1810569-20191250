@@ -1,4 +1,4 @@
-const { Likes, BlogPosts } = require('../models');
+const { likes: Likes, blog_posts: BlogPosts, Users } = require('../models');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 
 const likePost = async (userId, postId) => {
@@ -40,19 +40,32 @@ const likePost = async (userId, postId) => {
   }
 };
 
-const getPostLikes = async (postId) => {
+const getPostLikes = async (postId, currentUserId) => {
   try {
-    const likes = await Likes.findAll({
-      where: { postId },
-      include: [
-        {
-          model: BlogPosts,
-          as: 'post',
-          attributes: ['id', 'title', 'likes'],
-        },
-      ],
+    // Get the post with its total likes count
+    const post = await BlogPosts.findOne({
+      where: { id: postId },
+      attributes: ['id', 'title', 'likes'],
     });
-    return likes;
+
+    if (!post) {
+      throw new Error(ERROR_MESSAGES.POST_NOT_FOUND);
+    }
+
+    // Check if current user has liked this post
+    const hasLiked = currentUserId
+      ? await Likes.findOne({
+          where: {
+            userId: currentUserId,
+            postId,
+          },
+        })
+      : false;
+
+    return {
+      totalLikes: post.likes,
+      hasLiked: !!hasLiked,
+    };
   } catch (error) {
     throw error;
   }
