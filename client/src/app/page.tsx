@@ -222,7 +222,11 @@ export default function Home() {
                     <div className="md:w-1/4 relative h-40 md:h-[200px]">
                       <div className="relative w-full h-full rounded-xl overflow-hidden">
                         <Image
-                          src={isValidImageUrl(post.coverImage) ? post.coverImage! : DEFAULT_COVER_IMAGE}
+                          src={
+                            isValidImageUrl(post.coverImage)
+                              ? post.coverImage!
+                              : DEFAULT_COVER_IMAGE
+                          }
                           alt={post.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"
