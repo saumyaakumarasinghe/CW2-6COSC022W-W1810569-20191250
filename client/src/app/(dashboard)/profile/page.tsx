@@ -30,6 +30,17 @@ import {
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
 
+// Helper function to validate image URL
+const isValidImageUrl = (url: string | null): boolean => {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const UserProfilePage = () => {
   const [activeTab, setActiveTab] = useState('posts');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -376,10 +387,14 @@ const UserProfilePage = () => {
                       {post.coverImage && (
                         <div className="mt-4 relative w-full h-48">
                           <Image
-                            src={post.coverImage || DEFAULT_COVER_IMAGE}
+                            src={
+                              isValidImageUrl(post.coverImage)
+                                ? post.coverImage!
+                                : DEFAULT_COVER_IMAGE
+                            }
                             alt={post.title}
                             fill
-                            className="object-cover rounded-md"
+                            className="object-cover rounded-lg"
                           />
                         </div>
                       )}
