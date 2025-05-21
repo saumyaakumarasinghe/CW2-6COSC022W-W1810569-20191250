@@ -55,21 +55,18 @@ const UserProfilePage = () => {
   const { data: posts, isLoading: isPostsLoading } = useQuery<BlogPost[]>({
     queryKey: ['posts'],
     queryFn: () => blogService.getUserPosts(),
-    enabled: activeTab === 'posts',
   });
 
   // Fetch user's followers
   const { data: followers, isLoading: isFollowersLoading } = useQuery<Follower[]>({
     queryKey: ['followers'],
     queryFn: () => blogService.getFollowers(),
-    enabled: activeTab === 'followers',
   });
 
   // Fetch user's following
   const { data: following, isLoading: isFollowingLoading } = useQuery<Follower[]>({
     queryKey: ['following'],
     queryFn: () => blogService.getFollowing(),
-    enabled: activeTab === 'following',
   });
 
   const handleCreatePost = async () => {
