@@ -13,6 +13,17 @@ const ITEMS_PER_PAGE = 10;
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
 
+// Helper function to validate image URL
+const isValidImageUrl = (url: string | null): boolean => {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // Helper function to get author name
 const getAuthorName = (user: {
   firstName: string | null;
@@ -211,7 +222,11 @@ export default function Home() {
                     <div className="md:w-1/4 relative h-40 md:h-[200px]">
                       <div className="relative w-full h-full rounded-xl overflow-hidden">
                         <Image
-                          src={post.coverImage || DEFAULT_COVER_IMAGE}
+                          src={
+                            isValidImageUrl(post.coverImage)
+                              ? post.coverImage!
+                              : DEFAULT_COVER_IMAGE
+                          }
                           alt={post.title}
                           fill
                           sizes="(max-width: 768px) 100vw, 25vw"

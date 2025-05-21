@@ -14,6 +14,17 @@ import { useState } from 'react';
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
 
+// Helper function to validate image URL
+const isValidImageUrl = (url: string | null): boolean => {
+  if (!url) return false;
+  try {
+    new URL(url);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // Helper function to get author name
 const getAuthorName = (user: {
   firstName: string | null;
@@ -175,7 +186,7 @@ export default function PostPage() {
           <article className="bg-white shadow-xl rounded-lg overflow-hidden">
             <div className="relative w-full h-64 md:h-96">
               <Image
-                src={post.coverImage || DEFAULT_COVER_IMAGE}
+                src={isValidImageUrl(post.coverImage) ? post.coverImage! : DEFAULT_COVER_IMAGE}
                 alt={post.title}
                 fill
                 className="object-cover"
