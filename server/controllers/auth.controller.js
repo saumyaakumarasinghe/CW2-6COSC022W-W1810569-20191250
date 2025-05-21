@@ -98,17 +98,11 @@ const register = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
 
     // validate request body
-    if (!email || !oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
-    }
-
-    // check if user exists
-    const user = await userService.getUserByEmail(email);
-    if (!user) {
-      return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
     }
 
     // verify old password
