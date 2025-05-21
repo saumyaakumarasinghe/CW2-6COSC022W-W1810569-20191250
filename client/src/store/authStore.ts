@@ -37,6 +37,7 @@ interface AuthState {
   logout: () => void;
   setError: (error: string) => void;
   clearError: () => void;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -85,6 +86,23 @@ export const useAuthStore = create<AuthState>()(
         } catch (error: unknown) {
           set({
             error: error instanceof Error ? error.message : 'Registration failed',
+            isLoading: false,
+          });
+          throw error;
+        }
+      },
+
+      changePassword: async (currentPassword: string, newPassword: string) => {
+        try {
+          set({ isLoading: true, error: null });
+          await axiosInstance.post('/v1/oauth/reset-password', {
+            oldPassword: currentPassword,
+            newPassword,
+          });
+          set({ isLoading: false });
+        } catch (error: unknown) {
+          set({
+            error: error instanceof Error ? error.message : 'Failed to change password',
             isLoading: false,
           });
           throw error;

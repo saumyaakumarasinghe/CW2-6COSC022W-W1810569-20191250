@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { Follower, BlogPost, blogService } from '@/services/blogService';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuthStore } from '@/store/authStore';
@@ -42,6 +43,7 @@ const isValidImageUrl = (url: string | null): boolean => {
 };
 
 const UserProfilePage = () => {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('posts');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -166,6 +168,15 @@ const UserProfilePage = () => {
                       <span className="font-medium">User ID:</span> {user?.id}
                     </p>
                   </div>
+                </div>
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    className="text-blue-600 border-blue-200 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300"
+                    onClick={() => router.push('/change-password')}
+                  >
+                    Change Password
+                  </Button>
                 </div>
               </div>
             </div>
