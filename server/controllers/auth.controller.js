@@ -99,11 +99,14 @@ const register = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
+    const { userId } = req.user;
 
     // validate request body
     if (!oldPassword || !newPassword) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
+
+    const user = await userService.getUserById(userId);
 
     // verify old password
     const isPasswordValid = await comparePassword(oldPassword, user.password);
@@ -115,7 +118,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     // update password
-    await userService.updateUser(user.id, { password: hashedPassword });
+    await userService.updateUser(userId, { password: hashedPassword });
 
     res.status(STATUS_CODES.OK).json({
       message: 'Password reset successfully',
