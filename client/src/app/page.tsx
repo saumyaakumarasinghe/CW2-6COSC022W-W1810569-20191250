@@ -56,8 +56,27 @@ export default function Home() {
     queryFn: () => blogService.getPosts(searchTerm, skip, ITEMS_PER_PAGE),
   });
 
-  // Calculate total pages
-  const totalPages = Math.ceil((blogData?.total || 0) / ITEMS_PER_PAGE);
+  // Filter posts based on search results
+  const filteredPosts = searchTerm
+    ? blogData?.posts.filter((post) => {
+        // If there are no regular posts, hide special posts
+        if (blogData.total === 0) return false;
+
+        // If there are regular posts, show matching special posts
+        if (post.type !== 'regular') {
+          const matchesSearch =
+            post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.country.toLowerCase().includes(searchTerm.toLowerCase());
+          return matchesSearch;
+        }
+
+        return true;
+      })
+    : blogData?.posts;
+
+  // Calculate total pages based on filtered posts
+  const totalPages = Math.ceil((filteredPosts?.length || 0) / ITEMS_PER_PAGE);
 
   // Handle search
   const handleSearch = (value: string) => {
@@ -113,7 +132,7 @@ export default function Home() {
         {/* Search Results Info */}
         <div className="mb-6 text-center">
           <p className="text-gray-600">
-            {blogData?.total || 0} results found
+            {filteredPosts?.length || 0} results found
             {searchTerm && ` for "${searchTerm}"`}
           </p>
         </div>
@@ -136,7 +155,7 @@ export default function Home() {
                   </div>
                 </div>
               ))
-            : blogData?.posts.map((post) => (
+            : filteredPosts?.map((post) => (
                 <div key={post.id} className="bg-white p-6 rounded-lg shadow-sm">
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Content Section */}
