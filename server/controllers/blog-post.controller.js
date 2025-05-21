@@ -74,6 +74,21 @@ const getAllBlogPostsByUserId = async (req, res) => {
   }
 };
 
+const getFeedByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const posts = await blogPostService.getBlogPostsByUserId(userId);
+
+    res.status(STATUS_CODES.OK).json(posts);
+  } catch (err) {
+    console.error(err.message);
+    res
+      .status(STATUS_CODES.INTERNAL_SERVER_ERROR)
+      .json({ error: ERROR_MESSAGES.INTERNAL_SERVER_ERROR });
+  }
+};
+
 const getSingleBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
@@ -139,6 +154,7 @@ module.exports = {
   createBlogPost,
   getAllBlogPosts,
   getAllBlogPostsByUserId,
+  getFeedByUserId,
   getSingleBlogPost,
   updateBlogPost,
   deleteBlogPost,
