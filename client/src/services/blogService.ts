@@ -168,4 +168,9 @@ export const blogService = {
     const { data } = await axiosInstance.get<string[]>('/v1/country/');
     return data;
   },
+
+  // Follow a user
+  followUser: async (userId: number): Promise<void> => {
+    await axiosInstance.post(`/v1/follow/${userId}`);
+  },
 };

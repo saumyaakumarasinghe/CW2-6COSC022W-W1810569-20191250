@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Heart } from 'lucide-react';
+import { ArrowLeft, Heart, UserPlus } from 'lucide-react';
 import Header from '@/components/Header';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { blogService } from '@/services/blogService';
@@ -31,7 +31,7 @@ export default function PostPage() {
   const params = useParams();
   const postId = params?.id;
   const queryClient = useQueryClient();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [commentContent, setCommentContent] = useState('');
 
   // Fetch blog post using React Query
@@ -59,6 +59,26 @@ export default function PostPage() {
     enabled: !!postId,
   });
 
+  // Get followers list
+  const { data: followersData } = useQuery({
+    queryKey: ['followers'],
+    queryFn: () => blogService.getFollowers(),
+    enabled: isAuthenticated,
+  });
+
+  // Get following list
+  const { data: followingData } = useQuery({
+    queryKey: ['following'],
+    queryFn: () => blogService.getFollowing(),
+    enabled: isAuthenticated,
+  });
+
+  // Check if post author is following the current user
+  const isAuthorFollowing = followersData?.some((follower) => follower.id === post?.userId);
+
+  // Check if current user is following the post author
+  const isFollowingUser = followingData?.some((following) => following.id === post?.userId);
+
   // Add comment mutation
   const { mutate: addComment, isPending: isCommenting } = useMutation({
     mutationFn: (content: string) => blogService.addComment(postId as string, content),
@@ -83,6 +103,19 @@ export default function PostPage() {
     },
     onError: (error) => {
       console.error('Error toggling like:', error);
+    },
+  });
+
+  // Follow user mutation
+  const { mutate: followUser, isPending: isFollowing } = useMutation({
+    mutationFn: (userId: number) => blogService.followUser(userId),
+    onSuccess: () => {
+      // Invalidate and refetch both followers and following data
+      queryClient.invalidateQueries({ queryKey: ['followers'] });
+      queryClient.invalidateQueries({ queryKey: ['following'] });
+    },
+    onError: (error) => {
+      console.error('Error following user:', error);
     },
   });
 
@@ -150,7 +183,38 @@ export default function PostPage() {
               />
             </div>
             <div className="p-6 md:p-8">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{post.title}</h1>
+              <div className="flex items-center justify-between mb-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900">{post.title}</h1>
+                {isAuthenticated && post.userId !== user?.id && (
+                  <div className="flex items-center gap-2">
+                    {isAuthorFollowing && (
+                      <span className="text-sm text-gray-500">Follows you</span>
+                    )}
+                    <Button
+                      variant={isFollowingUser ? 'secondary' : 'outline'}
+                      size="sm"
+                      className={`flex items-center gap-1.5 px-4 py-2 text-sm font-medium transition-all duration-200 
+                        ${
+                          isFollowingUser
+                            ? 'bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 border border-red-200'
+                            : 'border-blue-200 text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300'
+                        }
+                        focus:ring-2 focus:ring-offset-2
+                        ${isFollowingUser ? 'focus:ring-red-100' : 'focus:ring-blue-100'}
+                        disabled:opacity-50 disabled:cursor-not-allowed`}
+                      onClick={() => followUser(post.userId)}
+                      disabled={isFollowing}
+                    >
+                      <UserPlus
+                        className={`w-4 h-4 transition-transform duration-200 ${isFollowingUser ? 'text-red-500' : ''}`}
+                      />
+                      <span>
+                        {isFollowing ? 'Following...' : isFollowingUser ? 'Unfollow' : 'Follow'}
+                      </span>
+                    </Button>
+                  </div>
+                )}
+              </div>
               <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
                 <div className="flex flex-wrap gap-x-4 gap-y-2">
                   <span className="font-medium text-gray-700">By {getAuthorName(post.user)}</span>
@@ -161,11 +225,12 @@ export default function PostPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 ${
-                      likesData?.hasLiked
-                        ? 'text-rose-500 bg-rose-100 border border-rose-200 hover:bg-rose-200 hover:text-rose-600'
-                        : 'text-gray-500 hover:text-rose-500 hover:bg-rose-50'
-                    }`}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-200 
+                      ${
+                        likesData?.hasLiked
+                          ? 'text-rose-500 bg-rose-100 border border-rose-200 hover:bg-rose-200 hover:text-rose-600'
+                          : 'text-gray-500 hover:text-rose-500 hover:bg-rose-50'
+                      } focus:ring-2 focus:ring-rose-100 focus:ring-offset-2`}
                     onClick={() => toggleLike()}
                     disabled={isLiking}
                   >
