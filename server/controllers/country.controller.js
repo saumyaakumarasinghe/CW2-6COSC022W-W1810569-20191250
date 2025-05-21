@@ -9,8 +9,10 @@ async function getAllCountries(req, res) {
       return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.COUNTRY_NOT_FOUND);
     }
 
-    // Map the response to the desired format
-    const payload = countries.map((country) => country.name?.common || 'N/A');
+    // Map the response to the desired format and sort alphabetically
+    const payload = countries
+      .map((country) => country.name?.common || 'N/A')
+      .sort((a, b) => a.localeCompare(b, 'en', { sensitivity: 'base' }));
 
     res.status(STATUS_CODES.OK).json(payload);
   } catch (err) {
