@@ -53,6 +53,10 @@ export default function Page() {
   async function onSubmit(values: z.infer<typeof SignupSchema>) {
     try {
       await register(values);
+      // Clear form after successful registration
+      form.reset();
+      // Redirect to login page
+      router.push('/login');
     } catch (error) {
       // Error is handled by the store
       console.error('Registration failed:', error);

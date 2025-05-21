@@ -52,20 +52,6 @@ export default function PostPage() {
     enabled: !!postId,
   });
 
-  // Toggle like mutation
-  const { mutate: toggleLike, isPending: isLiking } = useMutation({
-    mutationFn: () => blogService.toggleLike(postId as string),
-    onSuccess: () => {
-      // Invalidate and refetch both post and likes data
-      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
-      queryClient.invalidateQueries({ queryKey: ['like', postId] });
-    },
-    onError: (error) => {
-      console.error('Error toggling like:', error);
-      // You might want to show a toast notification here
-    },
-  });
-
   // Fetch comments using React Query
   const { data: commentsData, isLoading: isCommentsLoading } = useQuery({
     queryKey: ['comment', postId],
@@ -84,6 +70,19 @@ export default function PostPage() {
     },
     onError: (error) => {
       console.error('Error adding comment:', error);
+    },
+  });
+
+  // Toggle like mutation
+  const { mutate: toggleLike, isPending: isLiking } = useMutation({
+    mutationFn: () => blogService.toggleLike(postId as string),
+    onSuccess: () => {
+      // Invalidate and refetch both post and likes data
+      queryClient.invalidateQueries({ queryKey: ['blog-post', postId] });
+      queryClient.invalidateQueries({ queryKey: ['like', postId] });
+    },
+    onError: (error) => {
+      console.error('Error toggling like:', error);
     },
   });
 
@@ -177,24 +176,13 @@ export default function PostPage() {
                           : 'fill-none hover:scale-110'
                       }`}
                     />
-                    <span
-                      className={`font-medium text-base transition-colors duration-200 ${
-                        likesData?.hasLiked ? 'text-rose-500' : 'text-gray-500'
-                      }`}
-                    >
-                      {likesData?.totalLikes || 0}
-                    </span>
-                  </Button>
-                ) : (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="flex items-center gap-2 px-4 py-2 rounded-full text-gray-500 hover:text-rose-500 hover:bg-rose-50 transition-all duration-200"
-                    onClick={() => router.push('/login')}
-                  >
-                    <Heart className="w-5 h-5" />
                     <span className="font-medium text-base">{likesData?.totalLikes || 0}</span>
                   </Button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-gray-400" />
+                    <span className="text-gray-500">{likesData?.totalLikes || 0}</span>
+                  </div>
                 )}
               </div>
               <div className="prose prose-lg max-w-none text-gray-700">
@@ -231,10 +219,7 @@ export default function PostPage() {
             </form>
           ) : (
             <div className="mb-8 p-4 bg-gray-50 rounded-md text-center">
-              <p className="text-gray-600 mb-2">Please log in to leave a comment</p>
-              <Button onClick={() => router.push('/login')} variant="outline">
-                Log In
-              </Button>
+              <p className="text-gray-600">Sign in to leave a comment</p>
             </div>
           )}
 

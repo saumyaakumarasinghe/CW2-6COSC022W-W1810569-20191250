@@ -80,17 +80,8 @@ export const useAuthStore = create<AuthState>()(
       register: async (data: RegisterData) => {
         try {
           set({ isLoading: true, error: null });
-          const response = await axiosInstance.post<LoginResponse>('/v1/oauth/register', data);
-
-          // Set auth header for future requests
-          axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-
-          set({
-            user: response.data.user,
-            token: response.data.token,
-            isAuthenticated: true,
-            isLoading: false,
-          });
+          await axiosInstance.post<LoginResponse>('/v1/oauth/register', data);
+          set({ isLoading: false });
         } catch (error: unknown) {
           set({
             error: error instanceof Error ? error.message : 'Registration failed',
