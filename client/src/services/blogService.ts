@@ -14,6 +14,7 @@ export interface BlogPost {
   likesEnabled: boolean;
   createdAt: string;
   updatedAt: string;
+  type?: 'regular' | 'most_liked' | 'most_recent';
   user: {
     id: number;
     firstName: string | null;

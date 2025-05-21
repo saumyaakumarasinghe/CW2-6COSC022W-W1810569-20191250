@@ -13,6 +13,12 @@ const ITEMS_PER_PAGE = 10;
 const DEFAULT_COVER_IMAGE =
   'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&auto=format&fit=crop&q=60';
 
+// Add type tag colors mapping
+const TYPE_COLORS = {
+  most_liked: 'bg-rose-100 text-rose-700',
+  most_recent: 'bg-blue-100 text-blue-700',
+};
+
 // Helper function to validate image URL
 const isValidImageUrl = (url: string | null): boolean => {
   if (!url) return false;
@@ -135,7 +141,16 @@ export default function Home() {
                   <div className="flex flex-col md:flex-row gap-6">
                     {/* Content Section */}
                     <div className="flex-1">
-                      <h3 className="text-2xl font-bold mb-3">{post.title}</h3>
+                      <div className="flex items-center gap-2 mb-3">
+                        <h3 className="text-2xl font-bold">{post.title}</h3>
+                        {post.type && post.type !== 'regular' && (
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-medium ${TYPE_COLORS[post.type as keyof typeof TYPE_COLORS]}`}
+                          >
+                            {post.type === 'most_liked' ? 'Most Liked' : 'Latest'}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex flex-wrap gap-2 text-sm text-gray-500 mb-4">
                         <span className="flex items-center">
                           <svg
