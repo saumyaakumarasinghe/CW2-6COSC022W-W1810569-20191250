@@ -32,8 +32,52 @@ async function getAllBlogPosts(search_key, sort_by, limit, skip) {
       ];
     }
 
-    const { count, rows } = await BlogPosts.findAndCountAll({
-      where: whereClause,
+    // First, get the most liked post
+    const mostLikedPost = await BlogPosts.findOne({
+      order: [['likes', 'DESC']],
+      include: [
+        {
+          model: users,
+          attributes: ['id', 'firstName', 'lastName', 'userName', 'email'],
+          as: 'user',
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
+
+    // Get the most recent post
+    const mostRecentPost = await BlogPosts.findOne({
+      order: [['createdAt', 'DESC']],
+      include: [
+        {
+          model: users,
+          attributes: ['id', 'firstName', 'lastName', 'userName', 'email'],
+          as: 'user',
+        },
+      ],
+      raw: true,
+      nest: true,
+    });
+
+    // Get total count of regular posts (excluding special posts)
+    const totalRegularCount = await BlogPosts.count({
+      where: {
+        ...whereClause,
+        id: {
+          [Op.notIn]: [mostLikedPost?.id || 0, mostRecentPost?.id || 0],
+        },
+      },
+    });
+
+    // Get regular posts with pagination
+    const regularPosts = await BlogPosts.findAll({
+      where: {
+        ...whereClause,
+        id: {
+          [Op.notIn]: [mostLikedPost?.id || 0, mostRecentPost?.id || 0],
+        },
+      },
       limit: parseInt(limit) || 10,
       offset: parseInt(skip) || 0,
       order: [[sort_by || 'createdAt', 'DESC']],
@@ -44,11 +88,36 @@ async function getAllBlogPosts(search_key, sort_by, limit, skip) {
           as: 'user',
         },
       ],
+      raw: true,
+      nest: true,
     });
 
+    // Add type tags and combine posts
+    const regularPostsWithType = regularPosts.map((post) => ({
+      ...post,
+      type: 'regular',
+    }));
+
+    const specialPosts = [];
+    if (mostLikedPost) {
+      specialPosts.push({
+        ...mostLikedPost,
+        type: 'most_liked',
+      });
+    }
+    if (mostRecentPost && mostRecentPost.id !== mostLikedPost?.id) {
+      specialPosts.push({
+        ...mostRecentPost,
+        type: 'most_recent',
+      });
+    }
+
+    // Combine special posts with regular posts
+    const allPosts = [...specialPosts, ...regularPostsWithType];
+
     return {
-      total: count,
-      posts: rows,
+      total: totalRegularCount + specialPosts.length,
+      posts: allPosts,
     };
   } catch (error) {
     console.error('Error fetching blog posts:', error);
