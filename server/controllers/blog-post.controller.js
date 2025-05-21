@@ -4,7 +4,7 @@ const { ERROR_MESSAGES } = require('../constants/error.constants');
 
 const createBlogPost = async (req, res) => {
   try {
-    const { title, content, country, visit_date, cover_image, comments_enabled, likes_enabled } =
+    const { title, content, country, visitDate, coverImage, commentsEnabled, likesEnabled } =
       req.body;
 
     const { userId } = req.user;
@@ -18,10 +18,10 @@ const createBlogPost = async (req, res) => {
       title,
       content,
       country,
-      visit_date,
-      cover_image,
-      comments_enabled,
-      likes_enabled,
+      visitDate,
+      coverImage,
+      commentsEnabled,
+      likesEnabled,
     });
 
     res.status(STATUS_CODES.CREATED).json(createdBlogPost);

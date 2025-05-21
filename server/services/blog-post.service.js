@@ -1,7 +1,7 @@
 const { blog_posts: BlogPosts, sequelize, users } = require('../models/index');
 const { Op } = require('sequelize');
 
-async function createBlogPost({ userId, title, content, country, visitDate, coverImage }) {
+async function createBlogPost({ userId, title, content, country, visitDate, coverImage, commentsEnabled, likesEnabled }) {
   try {
     return await BlogPosts.create({
       userId,
@@ -10,8 +10,8 @@ async function createBlogPost({ userId, title, content, country, visitDate, cove
       country,
       visitDate,
       coverImage,
-      comments_enabled: true,
-      likes_enabled: true,
+      commentsEnabled,
+      likesEnabled,
       likes: 0,
       status: 'active',
     });
