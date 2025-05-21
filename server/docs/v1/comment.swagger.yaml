@@ -1,0 +1,394 @@
+paths:
+  /api/v1/blog-post/{id}/comment:
+    post:
+      tags:
+        - Comments
+      summary: Add a comment to a blog post
+      description: Creates a new comment on a specific blog post.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  example: 'This is a great post! Thanks for sharing.'
+      responses:
+        201:
+          description: Comment added successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  content:
+                    type: string
+                    example: 'This is a great post! Thanks for sharing.'
+                  userId:
+                    type: integer
+                    example: 1
+                  blogPostId:
+                    type: integer
+                    example: 1
+                  user:
+                    $ref: '#/components/schemas/User'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-03-15T10:30:00Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2024-03-15T10:30:00Z'
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+    get:
+      tags:
+        - Comments
+      summary: Get all comments for a blog post
+      description: Retrieves all comments for a specific blog post with pagination.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of comments to return
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of comments to skip
+      responses:
+        200:
+          description: Comments retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        content:
+                          type: string
+                          example: 'This is a great post! Thanks for sharing.'
+                        userId:
+                          type: integer
+                          example: 1
+                        blogPostId:
+                          type: integer
+                          example: 1
+                        user:
+                          $ref: '#/components/schemas/User'
+                        createdAt:
+                          type: string
+                          format: date-time
+                          example: '2024-03-15T10:30:00Z'
+                        updatedAt:
+                          type: string
+                          format: date-time
+                          example: '2024-03-15T10:30:00Z'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 10
+                  skip:
+                    type: integer
+                    example: 0
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/blog-post/{id}/comment/{commentId}:
+    put:
+      tags:
+        - Comments
+      summary: Update a comment
+      description: Updates an existing comment on a blog post.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                  example: 'Updated comment content'
+      responses:
+        200:
+          description: Comment updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  content:
+                    type: string
+                    example: 'Updated comment content'
+                  userId:
+                    type: integer
+                    example: 1
+                  blogPostId:
+                    type: integer
+                    example: 1
+                  user:
+                    $ref: '#/components/schemas/User'
+                  createdAt:
+                    type: string
+                    format: date-time
+                    example: '2024-03-15T10:30:00Z'
+                  updatedAt:
+                    type: string
+                    format: date-time
+                    example: '2024-03-15T10:30:00Z'
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        403:
+          description: Not authorized to update this comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Not authorized to update this comment'
+        404:
+          description: Blog post or comment not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post or comment not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+    delete:
+      tags:
+        - Comments
+      summary: Delete a comment
+      description: Deletes a comment from a blog post.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+        - name: commentId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the comment
+      responses:
+        200:
+          description: Comment deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Comment deleted successfully'
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        403:
+          description: Not authorized to delete this comment.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Not authorized to delete this comment'
+        404:
+          description: Blog post or comment not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post or comment not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          example: 'USER'
+        status:
+          type: boolean
+          example: true
+        lastActivateAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'

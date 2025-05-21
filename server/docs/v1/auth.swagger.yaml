@@ -1,0 +1,275 @@
+paths:
+  /api/v1/oauth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register a new user
+      description: Creates a new user account in the system.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - firstName
+                - lastName
+                - email
+                - password
+                - mobile
+              properties:
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: 'StrongP@ssw0rd'
+                mobile:
+                  type: string
+                  example: '+1234567890'
+      responses:
+        201:
+          description: User registered successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  firstName:
+                    type: string
+                    example: John
+                  lastName:
+                    type: string
+                    example: Doe
+                  email:
+                    type: string
+                    example: john.doe@example.com
+                  mobile:
+                    type: string
+                    example: '+1234567890'
+                  role:
+                    type: string
+                    example: 'USER'
+                  status:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        422:
+          description: User already exists.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User already exists'
+        400:
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid request body properties'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/oauth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login user
+      description: Authenticates a user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  example: 'StrongP@ssw0rd'
+      responses:
+        200:
+          description: Login successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  firstName:
+                    type: string
+                    example: John
+                  lastName:
+                    type: string
+                    example: Doe
+                  email:
+                    type: string
+                    example: john.doe@example.com
+                  role:
+                    type: string
+                    example: 'USER'
+                  status:
+                    type: boolean
+                    example: true
+                  token:
+                    type: string
+                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        401:
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid credentials'
+        403:
+          description: User account is not active.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User account is not active'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/oauth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset user password
+      description: Sends a password reset email to the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+      responses:
+        200:
+          description: Password reset email sent successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Password reset email sent successfully'
+        404:
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          example: 'USER'
+        status:
+          type: boolean
+          example: true
+        lastActivateAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'

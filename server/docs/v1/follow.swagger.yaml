@@ -1,0 +1,280 @@
+paths:
+  /api/v1/follow/{followedId}:
+    post:
+      tags:
+        - Follow
+      summary: Toggle follow/unfollow for a user
+      description: Follows or unfollows a user based on the current follow status.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: followedId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user to follow/unfollow
+      responses:
+        200:
+          description: Follow status toggled successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Successfully followed user'
+                  isFollowing:
+                    type: boolean
+                    example: true
+        400:
+          description: Cannot follow self.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'You cannot follow yourself'
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: User to follow not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/follow/following:
+    get:
+      tags:
+        - Follow
+      summary: Get users that the current user is following
+      description: Retrieves a list of users that the authenticated user is following.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of users to return
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of users to skip
+      responses:
+        200:
+          description: Following list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  following:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 10
+                  skip:
+                    type: integer
+                    example: 0
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/follow/followers:
+    get:
+      tags:
+        - Follow
+      summary: Get users that follow the current user
+      description: Retrieves a list of users that follow the authenticated user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+          description: Number of users to return
+        - name: skip
+          in: query
+          schema:
+            type: integer
+            default: 0
+          description: Number of users to skip
+      responses:
+        200:
+          description: Followers list retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  followers:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  total:
+                    type: integer
+                    example: 50
+                  limit:
+                    type: integer
+                    example: 10
+                  skip:
+                    type: integer
+                    example: 0
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/follow/stats:
+    get:
+      tags:
+        - Follow
+      summary: Get follow statistics
+      description: Retrieves the number of users the authenticated user is following and the number of followers they have.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Follow statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  followingCount:
+                    type: integer
+                    example: 50
+                  followersCount:
+                    type: integer
+                    example: 75
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        role:
+          type: string
+          enum: [USER, ADMIN]
+          example: 'USER'
+        status:
+          type: boolean
+          example: true
+        lastActivateAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-03-15T10:30:00Z'
