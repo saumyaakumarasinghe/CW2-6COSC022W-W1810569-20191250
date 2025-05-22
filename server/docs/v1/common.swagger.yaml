@@ -1,0 +1,249 @@
+paths:
+  /api/v1/countries:
+    get:
+      tags:
+        - Common
+      summary: Get all countries
+      description: Retrieves a list of all available countries.
+      responses:
+        200:
+          description: Countries retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: 'Sri Lanka'
+                    code:
+                      type: string
+                      example: 'LK'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/statistics:
+    get:
+      tags:
+        - Common
+      summary: Get system statistics
+      description: Retrieves various statistics about the system including user counts, blog post counts, and engagement metrics.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: Statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                    example: 1000
+                  activeUsers:
+                    type: integer
+                    example: 750
+                  totalBlogPosts:
+                    type: integer
+                    example: 500
+                  totalComments:
+                    type: integer
+                    example: 2000
+                  totalLikes:
+                    type: integer
+                    example: 5000
+                  totalFollows:
+                    type: integer
+                    example: 3000
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        country:
+                          type: string
+                          example: 'Sri Lanka'
+                        count:
+                          type: integer
+                          example: 50
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/statistics/user/{userId}:
+    get:
+      tags:
+        - Common
+      summary: Get user statistics
+      description: Retrieves statistics for a specific user including their blog posts, comments, likes, and follows.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the user
+      responses:
+        200:
+          description: User statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalBlogPosts:
+                    type: integer
+                    example: 25
+                  totalComments:
+                    type: integer
+                    example: 100
+                  totalLikes:
+                    type: integer
+                    example: 250
+                  totalFollowers:
+                    type: integer
+                    example: 150
+                  totalFollowing:
+                    type: integer
+                    example: 100
+                  countries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        country:
+                          type: string
+                          example: 'Sri Lanka'
+                        count:
+                          type: integer
+                          example: 10
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/statistics/blog-post/{postId}:
+    get:
+      tags:
+        - Common
+      summary: Get blog post statistics
+      description: Retrieves statistics for a specific blog post including views, likes, and comments.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: postId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the blog post
+      responses:
+        200:
+          description: Blog post statistics retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  views:
+                    type: integer
+                    example: 1000
+                  likes:
+                    type: integer
+                    example: 50
+                  comments:
+                    type: integer
+                    example: 25
+                  engagementRate:
+                    type: number
+                    format: float
+                    example: 7.5
+        401:
+          description: Unauthorized - User not authenticated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Unauthorized'
+        404:
+          description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Blog post not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Internal server error'

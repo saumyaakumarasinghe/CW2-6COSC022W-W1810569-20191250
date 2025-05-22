@@ -1,13 +1,14 @@
-const { User, sequelize } = require('../models/index');
+const { users: Users, sequelize } = require('../models/index');
 
-async function createUser(userName, email, mobile, password, is_subscribed) {
+async function createUser(userName, email, mobile, password, firstName, lastName) {
   try {
-    return User.create({
+    return Users.create({
       userName,
+      firstName,
+      lastName,
       email,
       mobile,
       password,
-      is_subscribed,
       lastActivateAt: Date.now(),
       status: true,
     });
@@ -19,7 +20,7 @@ async function createUser(userName, email, mobile, password, is_subscribed) {
 
 async function getAllUsers() {
   try {
-    return User.findAll();
+    return Users.findAll();
   } catch (error) {
     console.error('Error fetching users:', error);
     throw error;
@@ -30,7 +31,7 @@ async function getUserById(userId) {
   try {
     console.log(userId);
 
-    return User.findOne({
+    return Users.findOne({
       where: { id: userId },
     });
   } catch (error) {
@@ -41,7 +42,7 @@ async function getUserById(userId) {
 
 async function getUserByEmail(email) {
   try {
-    return User.findOne({
+    return Users.findOne({
       where: { email },
     });
   } catch (error) {
@@ -54,7 +55,7 @@ async function updateUser(userId, userData) {
   try {
     console.log('userData', userData);
 
-    await User.update(userData, { where: { id: userId } });
+    await Users.update(userData, { where: { id: userId } });
 
     return getUserById(userId);
   } catch (error) {
@@ -64,18 +65,14 @@ async function updateUser(userId, userData) {
 }
 
 async function deleteUser(userId) {
-  const transaction = await sequelize.transaction();
   try {
     // Delete the user
-    const result = await User.destroy({
+    const result = await Users.destroy({
       where: { id: userId },
-      transaction,
     });
 
-    await transaction.commit();
     return result;
   } catch (error) {
-    await transaction.rollback();
     console.error('Error deleting user:', error);
     throw error;
   }

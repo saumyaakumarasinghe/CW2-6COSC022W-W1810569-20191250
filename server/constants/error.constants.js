@@ -21,6 +21,11 @@ const ERROR_MESSAGES = {
   SELF_DELETE_NOT_ALLOWED: 'Self deletion is not allowed!',
   SELF_DEACTIVATION_NOT_ALLOWED: 'Self deactivation is not allowed!',
   NOT_AUTHORIZED: 'Not authorized to perform this action',
+  LIKE_FAILED: 'Failed to like/unlike post',
+  LIKE_FETCH_FAILED: 'Failed to fetch likes',
+  POST_NOT_FOUND: 'Post not found',
+  LIKES_DISABLED: 'Likes are disabled for this post',
+  CANNOT_FOLLOW_SELF: 'You cannot follow yourself',
 };
 
 module.exports = { ERROR_MESSAGES };

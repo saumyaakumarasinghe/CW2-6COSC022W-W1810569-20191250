@@ -1,4 +1,4 @@
-const userDao = require('../services/user.service');
+const userService = require('../services/user.service');
 const { hashPassword, comparePassword } = require('../utils/password.util');
 const { generateToken } = require('../utils/token.util');
 const { sequelize } = require('../models/index');
@@ -16,7 +16,7 @@ const login = async (req, res) => {
     }
 
     // check if user exists
-    const existUser = await userDao.getUserByEmail(email);
+    const existUser = await userService.getUserByEmail(email);
     if (!existUser) return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
 
     if (existUser.status === false)
@@ -28,7 +28,7 @@ const login = async (req, res) => {
 
     // update last active at
     const now = Date.now();
-    const updatedUser = await userDao.updateUser(existUser.id, { now }, transaction);
+    const updatedUser = await userService.updateUser(existUser.id, { now }, transaction);
 
     // create token
     const tokenPayload = {
@@ -46,6 +46,7 @@ const login = async (req, res) => {
         id: existUser.id,
         firstName: existUser.firstName,
         lastName: existUser.lastName,
+        userName: existUser.userName,
         email: existUser.email,
         role: existUser.role,
         status: existUser.status,
@@ -62,21 +63,28 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
   try {
-    let { userName, email, mobile, password, is_subscribed } = req.body;
+    let { userName, firstName, lastName, email, mobile, password } = req.body;
 
     // validate request body
-    if (!userName || !email || !mobile || !password || !is_subscribed) {
+    if (!userName || !email || !mobile || !password || !firstName || !lastName) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
     // check email already exist
-    const existUser = await userDao.getUserByEmail(email);
+    const existUser = await userService.getUserByEmail(email);
     if (existUser)
       return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_ALREADY_EXISTS);
 
     password = await hashPassword(password);
 
-    const user = await userDao.createUser(userName, email, mobile, password, is_subscribed);
+    const user = await userService.createUser(
+      userName,
+      email,
+      mobile,
+      password,
+      firstName,
+      lastName
+    );
 
     const payload = {
       userId: user.id,
@@ -90,18 +98,15 @@ const register = async (req, res) => {
 
 const resetPassword = async (req, res) => {
   try {
-    const { email, oldPassword, newPassword } = req.body;
+    const { oldPassword, newPassword } = req.body;
+    const { userId } = req.user;
 
     // validate request body
-    if (!email || !oldPassword || !newPassword) {
+    if (!oldPassword || !newPassword) {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
-    // check if user exists
-    const user = await userDao.getUserByEmail(email);
-    if (!user) {
-      return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
-    }
+    const user = await userService.getUserById(userId);
 
     // verify old password
     const isPasswordValid = await comparePassword(oldPassword, user.password);
@@ -113,7 +118,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     // update password
-    await userDao.updateUser(user.id, { password: hashedPassword });
+    await userService.updateUser(userId, { password: hashedPassword });
 
     res.status(STATUS_CODES.OK).json({
       message: 'Password reset successfully',

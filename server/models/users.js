@@ -1,8 +1,16 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define('User', {
+  const Users = sequelize.define('users', {
     userName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    firstName: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    lastName: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -27,12 +35,22 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    is_subscribed: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
   });
 
-  return User;
+  Users.associate = (models) => {
+    Users.hasMany(models.blog_posts, {
+      foreignKey: 'userId',
+      as: 'posts',
+    });
+    Users.hasMany(models.comments, {
+      foreignKey: 'userId',
+      as: 'comments',
+    });
+    Users.hasMany(models.likes, {
+      foreignKey: 'userId',
+      as: 'likes',
+    });
+  };
+
+  return Users;
 };
