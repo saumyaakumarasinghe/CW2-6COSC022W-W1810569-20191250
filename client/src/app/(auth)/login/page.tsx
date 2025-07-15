@@ -24,7 +24,7 @@ const LoginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
-export default function Page() {
+export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading, error, isAuthenticated } = useAuthStore();
 

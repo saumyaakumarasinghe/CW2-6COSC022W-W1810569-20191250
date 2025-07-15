@@ -42,7 +42,7 @@ const isValidImageUrl = (url: string | null): boolean => {
   }
 };
 
-const UserProfilePage = () => {
+export default function UserProfilePage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('posts');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -593,6 +593,4 @@ const UserProfilePage = () => {
       </div>
     </>
   );
-};
-
-export default UserProfilePage;
+}

@@ -28,7 +28,7 @@ const SignupSchema = z.object({
   mobile: z.string().min(10, 'Enter a valid mobile number'),
 });
 
-export default function Page() {
+export default function SignupPage() {
   const router = useRouter();
   const { register, isLoading, error, isAuthenticated } = useAuthStore();
 

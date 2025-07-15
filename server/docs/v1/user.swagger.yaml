@@ -1,107 +1,10 @@
 paths:
-  /api/v1/user/profile:
-    get:
+  /api/v1/user:
+    post:
       tags:
         - Users
-      summary: Get user profile
-      description: Retrieves the profile information of the authenticated user.
-      security:
-        - BearerAuth: []
-      responses:
-        200:
-          description: User profile retrieved successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal server error'
-
-    put:
-      tags:
-        - Users
-      summary: Update user profile
-      description: Updates the profile information of the authenticated user.
-      security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName:
-                  type: string
-                  example: John
-                lastName:
-                  type: string
-                  example: Doe
-                mobile:
-                  type: string
-                  example: '+1234567890'
-      responses:
-        200:
-          description: User profile updated successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-        400:
-          description: Invalid request body.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid request body properties'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Internal server error'
-
-  /api/v1/user/change-password:
-    put:
-      tags:
-        - Users
-      summary: Change user password
-      description: Changes the password of the authenticated user.
+      summary: Create a new user
+      description: Creates a new user account (admin only).
       security:
         - BearerAuth: []
       requestBody:
@@ -111,20 +14,38 @@ paths:
             schema:
               type: object
               required:
-                - currentPassword
-                - newPassword
+                - userName
+                - email
+                - mobile
+                - password
+                - isSubscribed
               properties:
-                currentPassword:
+                userName:
+                  type: string
+                  example: johndoe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                mobile:
+                  type: string
+                  example: '+1234567890'
+                password:
                   type: string
                   format: password
-                  example: 'CurrentP@ssw0rd'
-                newPassword:
-                  type: string
-                  format: password
-                  example: 'NewP@ssw0rd'
+                  example: 'StrongP@ssw0rd'
+                isSubscribed:
+                  type: boolean
+                  example: true
       responses:
-        200:
-          description: Password changed successfully.
+        201:
+          description: User created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: User already exists or invalid request body.
           content:
             application/json:
               schema:
@@ -132,9 +53,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Password changed successfully'
-        400:
-          description: Invalid request body.
+                    example: 'User already exists'
+        422:
+          description: User already exists.
           content:
             application/json:
               schema:
@@ -142,17 +63,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Invalid request body properties'
-        401:
-          description: Unauthorized - User not authenticated or invalid current password.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Invalid current password'
+                    example: 'User already exists'
         500:
           description: Internal server error.
           content:
@@ -160,39 +71,26 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
-  /api/v1/user/deactivate:
-    put:
+    get:
       tags:
         - Users
-      summary: Deactivate user account
-      description: Deactivates the account of the authenticated user.
+      summary: Get all users
+      description: Retrieves a list of all users in the system.
       security:
         - BearerAuth: []
       responses:
         200:
-          description: Account deactivated successfully.
+          description: Users retrieved successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Account deactivated successfully'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
         500:
           description: Internal server error.
           content:
@@ -200,7 +98,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
@@ -208,8 +106,8 @@ paths:
     get:
       tags:
         - Users
-      summary: Get user by ID
-      description: Retrieves the profile information of a specific user.
+      summary: Get a single user
+      description: Retrieves a specific user by ID.
       security:
         - BearerAuth: []
       parameters:
@@ -218,24 +116,14 @@ paths:
           required: true
           schema:
             type: integer
-          description: ID of the user
+          description: User ID
       responses:
         200:
-          description: User profile retrieved successfully.
+          description: User retrieved successfully.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
         404:
           description: User not found.
           content:
@@ -253,7 +141,203 @@ paths:
               schema:
                 type: object
                 properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
+
+    put:
+      tags:
+        - Users
+      summary: Update a user
+      description: Updates an existing user's information.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userName:
+                  type: string
+                  example: johndoe
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                email:
+                  type: string
+                  format: email
+                  example: john.doe@example.com
+                mobile:
+                  type: string
+                  example: '+1234567890'
+      responses:
+        200:
+          description: User updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: Email already exists or forbidden.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
                   message:
+                    type: string
+                    example: 'Forbidden!'
+        404:
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
+
+    delete:
+      tags:
+        - Users
+      summary: Delete a user
+      description: Deletes a user from the system.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        200:
+          description: User deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User deleted successfully'
+        403:
+          description: Self deletion not allowed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Self delete not allowed'
+        404:
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/user/{id}/status:
+    patch:
+      tags:
+        - Users
+      summary: Update user status
+      description: Updates the active/inactive status of a user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: boolean
+                  example: false
+      responses:
+        200:
+          description: User status updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        403:
+          description: Self deactivation not allowed or invalid request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Self deactivation not allowed'
+        404:
+          description: User not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'User not found'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
                     type: string
                     example: 'Internal server error'
 
@@ -265,6 +349,70 @@ components:
         id:
           type: integer
           example: 1
+        userName:
+          type: string
+          example: johndoe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        lastActivateAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        status:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+
+    CreateUserRequest:
+      type: object
+      required:
+        - userName
+        - email
+        - mobile
+        - password
+        - isSubscribed
+      properties:
+        userName:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          format: email
+          example: john.doe@example.com
+        mobile:
+          type: string
+          example: '+1234567890'
+        password:
+          type: string
+          format: password
+          example: 'StrongP@ssw0rd'
+        isSubscribed:
+          type: boolean
+          example: true
+
+    UpdateUserRequest:
+      type: object
+      properties:
+        userName:
+          type: string
+          example: johndoe
         firstName:
           type: string
           example: John
@@ -278,22 +426,29 @@ components:
         mobile:
           type: string
           example: '+1234567890'
-        role:
-          type: string
-          enum: [USER, ADMIN]
-          example: 'USER'
+
+    UpdateUserStatusRequest:
+      type: object
+      required:
+        - status
+      properties:
         status:
           type: boolean
-          example: true
-        lastActivateAt:
+          example: false
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
           type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        createdAt:
+          example: 'Operation successful'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
           type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        updatedAt:
+          example: 'Error message'
+        error:
           type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
+          example: 'Error message'

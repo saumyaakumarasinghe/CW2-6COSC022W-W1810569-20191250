@@ -2,9 +2,9 @@ paths:
   /api/v1/blog-post:
     post:
       tags:
-        - Blog Post
+        - Blog Posts
       summary: Create a new blog post
-      description: Creates a new blog post in the system.
+      description: Creates a new blog post for the authenticated user.
       security:
         - BearerAuth: []
       requestBody:
@@ -13,20 +13,24 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - title
+                - content
+                - country
               properties:
                 title:
                   type: string
-                  example: My Trip to Paris
+                  example: 'My Amazing Trip to Japan'
                 content:
                   type: string
-                  example: Had an amazing time exploring the Eiffel Tower...
+                  example: 'This was an incredible journey through the beautiful landscapes of Japan...'
                 country:
                   type: string
-                  example: France
+                  example: 'Japan'
                 visitDate:
                   type: string
                   format: date
-                  example: '2024-05-01'
+                  example: '2024-01-15'
                 coverImage:
                   type: string
                   example: 'https://example.com/image.jpg'
@@ -43,45 +47,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogPost'
-        401:
-          description: Unauthorized. Missing or invalid JWT token.
-        403:
-          description: Invalid request body properties.
+        400:
+          description: Invalid request body.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Invalid request body properties'
         500:
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
 
     get:
       tags:
-        - Blog Post
+        - Blog Posts
       summary: Get all blog posts
-      description: Retrieves a list of all blog posts with optional filtering and pagination.
+      description: Retrieves a paginated list of all blog posts with optional search and sorting.
       parameters:
         - name: search_key
           in: query
-          description: Search term for title, content, or country
           schema:
             type: string
+          description: Search term to filter posts
         - name: sort_by
           in: query
-          description: Field to sort by (createdAt, updatedAt, title, country, likes, visitDate)
           schema:
             type: string
             enum: [createdAt, updatedAt, title, country, likes, visitDate]
+          description: Field to sort by
         - name: limit
           in: query
-          description: Number of posts to return
           schema:
             type: integer
-            default: 10
+          description: Number of posts to return
         - name: skip
           in: query
-          description: Number of posts to skip
           schema:
             type: integer
-            default: 0
+          description: Number of posts to skip
       responses:
         200:
-          description: List of blog posts retrieved successfully.
+          description: Blog posts retrieved successfully.
           content:
             application/json:
               schema:
@@ -89,7 +105,7 @@ paths:
                 properties:
                   total:
                     type: integer
-                    example: 50
+                    example: 100
                   posts:
                     type: array
                     items:
@@ -102,19 +118,91 @@ paths:
                     example: 0
         500:
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/blog-post/user:
+    get:
+      tags:
+        - Blog Posts
+      summary: Get current user's blog posts
+      description: Retrieves all blog posts created by the authenticated user.
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: User's blog posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogPost'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
+
+  /api/v1/blog-post/user/{userId}:
+    get:
+      tags:
+        - Blog Posts
+      summary: Get user's blog posts
+      description: Retrieves all blog posts created by a specific user.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        200:
+          description: User's blog posts retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BlogPost'
+        500:
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
 
   /api/v1/blog-post/{id}:
     get:
       tags:
-        - Blog Post
+        - Blog Posts
       summary: Get a single blog post
-      description: Retrieves a blog post by its ID.
+      description: Retrieves a specific blog post by ID.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: integer
+          description: Blog post ID
       responses:
         200:
           description: Blog post retrieved successfully.
@@ -124,14 +212,30 @@ paths:
                 $ref: '#/components/schemas/BlogPost'
         404:
           description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Post not found'
         500:
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
 
     put:
       tags:
-        - Blog Post
+        - Blog Posts
       summary: Update a blog post
-      description: Updates a blog post's details. Only the post owner can update it.
+      description: Updates an existing blog post.
       security:
         - BearerAuth: []
       parameters:
@@ -140,6 +244,7 @@ paths:
           required: true
           schema:
             type: integer
+          description: Blog post ID
       requestBody:
         required: true
         content:
@@ -149,20 +254,20 @@ paths:
               properties:
                 title:
                   type: string
-                  example: My Trip to Paris
+                  example: 'Updated Trip Title'
                 content:
                   type: string
-                  example: Had an amazing time exploring the Eiffel Tower...
+                  example: 'Updated content...'
                 country:
                   type: string
-                  example: France
+                  example: 'Japan'
                 visitDate:
                   type: string
                   format: date
-                  example: '2024-05-01'
+                  example: '2024-01-15'
                 coverImage:
                   type: string
-                  example: 'https://example.com/image.jpg'
+                  example: 'https://example.com/updated-image.jpg'
                 commentsEnabled:
                   type: boolean
                   example: true
@@ -176,20 +281,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BlogPost'
-        401:
-          description: Unauthorized. Missing or invalid JWT token.
-        403:
-          description: Not authorized to update this post.
         404:
           description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Post not found'
         500:
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
 
     delete:
       tags:
-        - Blog Post
+        - Blog Posts
       summary: Delete a blog post
-      description: Deletes a blog post. Only the post owner can delete it.
+      description: Deletes a blog post.
       security:
         - BearerAuth: []
       parameters:
@@ -198,6 +315,7 @@ paths:
           required: true
           schema:
             type: integer
+          description: Blog post ID
       responses:
         200:
           description: Blog post deleted successfully.
@@ -208,15 +326,27 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Blog post deleted successfully
-        401:
-          description: Unauthorized. Missing or invalid JWT token.
-        403:
-          description: Not authorized to delete this post.
+                    example: 'Blog post deleted successfully'
         404:
           description: Blog post not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: 'Post not found'
         500:
           description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: 'Internal server error'
 
 components:
   schemas:
@@ -226,61 +356,154 @@ components:
         id:
           type: integer
           example: 1
+        userId:
+          type: integer
+          example: 1
         title:
           type: string
-          example: My Trip to Paris
+          example: 'My Amazing Trip to Japan'
         content:
           type: string
-          example: Had an amazing time exploring the Eiffel Tower...
+          example: 'This was an incredible journey through the beautiful landscapes of Japan...'
         country:
           type: string
-          example: France
+          example: 'Japan'
         visitDate:
           type: string
           format: date
-          example: '2024-05-01'
+          example: '2024-01-15'
         coverImage:
           type: string
           example: 'https://example.com/image.jpg'
         likes:
           type: integer
-          example: 0
+          example: 25
         status:
           type: string
           enum: [active, deleted, hidden]
-          example: active
+          example: 'active'
         commentsEnabled:
           type: boolean
           example: true
         likesEnabled:
           type: boolean
           example: true
-        userId:
-          type: integer
-          example: 1
-        user:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            userName:
-              type: string
-              example: john_doe
-            firstName:
-              type: string
-              example: John
-            lastName:
-              type: string
-              example: Doe
-            email:
-              type: string
-              example: john@example.com
         createdAt:
           type: string
           format: date-time
-          example: '2024-05-01T12:00:00Z'
+          example: '2024-01-15T10:30:00.000Z'
         updatedAt:
           type: string
           format: date-time
-          example: '2024-05-01T12:00:00Z'
+          example: '2024-01-15T10:30:00.000Z'
+        user:
+          $ref: '#/components/schemas/User'
+
+    CreateBlogPostRequest:
+      type: object
+      required:
+        - title
+        - content
+        - country
+      properties:
+        title:
+          type: string
+          example: 'My Amazing Trip to Japan'
+        content:
+          type: string
+          example: 'This was an incredible journey through the beautiful landscapes of Japan...'
+        country:
+          type: string
+          example: 'Japan'
+        visitDate:
+          type: string
+          format: date
+          example: '2024-01-15'
+        coverImage:
+          type: string
+          example: 'https://example.com/image.jpg'
+        commentsEnabled:
+          type: boolean
+          example: true
+        likesEnabled:
+          type: boolean
+          example: true
+
+    UpdateBlogPostRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          example: 'Updated Trip Title'
+        content:
+          type: string
+          example: 'Updated content...'
+        country:
+          type: string
+          example: 'Japan'
+        visitDate:
+          type: string
+          format: date
+          example: '2024-01-15'
+        coverImage:
+          type: string
+          example: 'https://example.com/updated-image.jpg'
+        commentsEnabled:
+          type: boolean
+          example: true
+        likesEnabled:
+          type: boolean
+          example: true
+
+    BlogPostListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/BlogPost'
+        limit:
+          type: integer
+          example: 10
+        skip:
+          type: integer
+          example: 0
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userName:
+          type: string
+          example: johndoe
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        email:
+          type: string
+          example: john.doe@example.com
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Operation successful'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Error message'
+        error:
+          type: string
+          example: 'Error message'

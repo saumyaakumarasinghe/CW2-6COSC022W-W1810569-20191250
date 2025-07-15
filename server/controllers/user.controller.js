@@ -1,4 +1,4 @@
-const userService = require('../services/user.service');
+const userService = require('../services/user.database.service');
 const { hashPassword } = require('../utils/password.util');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');

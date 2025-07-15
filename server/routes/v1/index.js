@@ -1,21 +1,21 @@
 const express = require('express');
 const routesV1 = express.Router();
-const { checkAuth } = require('../../middleware/check-token.middleware');
+const { checkAuth } = require('../../middleware/token.middleware');
 
-const authRoutes = require('./auth.routes');
-const userRoutes = require('./user.routes');
-const countryRoutes = require('./country.routes');
-const blogPostRoutes = require('./blog-post.routes');
-const commentRoutes = require('./comment.routes');
-const likeRoutes = require('./like.routes');
-const followRoutes = require('./follow.routes');
+const authRouter = require('./auth.routes');
+const userRouter = require('./user.routes');
+const countryRouter = require('./country.routes');
+const blogPostRouter = require('./blog-post.routes');
+const commentRouter = require('./comment.routes');
+const likeRouter = require('./like.routes');
+const followRouter = require('./follow.routes');
 
-routesV1.use('/oauth', authRoutes);
-routesV1.use('/user', checkAuth, userRoutes);
-routesV1.use('/country', checkAuth, countryRoutes);
-routesV1.use('/blog-post', blogPostRoutes);
-routesV1.use('/comment', commentRoutes);
-routesV1.use('/like', likeRoutes);
-routesV1.use('/follow', checkAuth, followRoutes);
+routesV1.use('/oauth', authRouter);
+routesV1.use('/user', checkAuth, userRouter);
+routesV1.use('/country', checkAuth, countryRouter);
+routesV1.use('/blog-post', blogPostRouter);
+routesV1.use('/comment', commentRouter);
+routesV1.use('/like', likeRouter);
+routesV1.use('/follow', checkAuth, followRouter);
 
 module.exports = routesV1;

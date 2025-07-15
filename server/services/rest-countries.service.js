@@ -7,7 +7,7 @@ async function getAllRestCountries() {
     const url = `${URL}/all`;
     const response = await axios.get(url);
 
-    return response.data;
+    return response;
   } catch (err) {
     console.log(err.message);
     return null; // Return null if the request fails

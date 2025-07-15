@@ -1,19 +1,19 @@
 paths:
-  /api/v1/blog-post/{id}/like:
+  /api/v1/like/{postId}:
     post:
       tags:
         - Likes
-      summary: Toggle like/unlike for a blog post
-      description: Likes or unlikes a blog post based on the current like status.
+      summary: Toggle like on a post
+      description: Toggles the like status for a blog post. If the user has already liked the post, it will unlike it. If not, it will like it.
       security:
         - BearerAuth: []
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
           schema:
             type: integer
-          description: ID of the blog post
+          description: Blog post ID
       responses:
         200:
           description: Like status toggled successfully.
@@ -24,33 +24,23 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Successfully liked post'
-                  isLiked:
+                    example: 'Post liked successfully'
+                  liked:
                     type: boolean
                     example: true
-                  likesCount:
+                  totalLikes:
                     type: integer
-                    example: 42
-        401:
-          description: Unauthorized - User not authenticated.
+                    example: 25
+        400:
+          description: Invalid request parameters.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    example: 'Unauthorized'
-        404:
-          description: Blog post not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Blog post not found'
+                    example: 'Invalid request parameters'
         500:
           description: Internal server error.
           content:
@@ -58,78 +48,52 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
-  /api/v1/blog-post/{id}/likes:
     get:
       tags:
         - Likes
-      summary: Get users who liked a blog post
-      description: Retrieves a list of users who have liked a specific blog post.
+      summary: Get likes for a post (authenticated)
+      description: Retrieves the likes for a specific blog post with information about whether the current user has liked it.
       security:
         - BearerAuth: []
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
           schema:
             type: integer
-          description: ID of the blog post
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 10
-          description: Number of users to return
-        - name: skip
-          in: query
-          schema:
-            type: integer
-            default: 0
-          description: Number of users to skip
+          description: Blog post ID
       responses:
         200:
-          description: Liked users list retrieved successfully.
+          description: Post likes retrieved successfully.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  users:
+                  totalLikes:
+                    type: integer
+                    example: 25
+                  hasLiked:
+                    type: boolean
+                    example: true
+                  likes:
                     type: array
                     items:
-                      $ref: '#/components/schemas/User'
-                  total:
-                    type: integer
-                    example: 50
-                  limit:
-                    type: integer
-                    example: 10
-                  skip:
-                    type: integer
-                    example: 0
-        401:
-          description: Unauthorized - User not authenticated.
+                      $ref: '#/components/schemas/Like'
+        400:
+          description: Invalid request parameters.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    example: 'Unauthorized'
-        404:
-          description: Blog post not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Blog post not found'
+                    example: 'Invalid request parameters'
         500:
           description: Internal server error.
           content:
@@ -137,59 +101,48 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
-  /api/v1/blog-post/{id}/like/status:
+  /api/v1/like/public/{postId}:
     get:
       tags:
         - Likes
-      summary: Get like status for a blog post
-      description: Checks if the authenticated user has liked a specific blog post.
-      security:
-        - BearerAuth: []
+      summary: Get likes for a post (public)
+      description: Retrieves the likes for a specific blog post without authentication. This endpoint is publicly accessible.
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
           schema:
             type: integer
-          description: ID of the blog post
+          description: Blog post ID
       responses:
         200:
-          description: Like status retrieved successfully.
+          description: Post likes retrieved successfully.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  isLiked:
-                    type: boolean
-                    example: true
-                  likesCount:
+                  totalLikes:
                     type: integer
-                    example: 42
-        401:
-          description: Unauthorized - User not authenticated.
+                    example: 25
+                  likes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Like'
+        400:
+          description: Invalid request parameters.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    example: 'Unauthorized'
-        404:
-          description: Blog post not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Blog post not found'
+                    example: 'Invalid request parameters'
         500:
           description: Internal server error.
           content:
@@ -197,18 +150,78 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
 components:
   schemas:
+    Like:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        postId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        user:
+          $ref: '#/components/schemas/User'
+
+    ToggleLikeResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: 'Post liked successfully'
+        liked:
+          type: boolean
+          example: true
+        totalLikes:
+          type: integer
+          example: 25
+
+    PostLikesResponse:
+      type: object
+      properties:
+        totalLikes:
+          type: integer
+          example: 25
+        hasLiked:
+          type: boolean
+          example: true
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+
+    PublicPostLikesResponse:
+      type: object
+      properties:
+        totalLikes:
+          type: integer
+          example: 25
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Like'
+
     User:
       type: object
       properties:
         id:
           type: integer
           example: 1
+        userName:
+          type: string
+          example: johndoe
         firstName:
           type: string
           example: John
@@ -217,27 +230,11 @@ components:
           example: Doe
         email:
           type: string
-          format: email
           example: john.doe@example.com
-        mobile:
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
           type: string
-          example: '+1234567890'
-        role:
-          type: string
-          enum: [USER, ADMIN]
-          example: 'USER'
-        status:
-          type: boolean
-          example: true
-        lastActivateAt:
-          type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
+          example: 'Error message'
