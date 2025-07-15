@@ -5,8 +5,17 @@ const { getRestCountryByName, getAllRestCountries } = require('../services/rest-
 async function getAllCountries(req, res) {
   try {
     const countries = await getAllRestCountries();
+    console.log('countries', countries);
+
     if (!countries || countries.length === 0) {
-      return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.COUNTRY_NOT_FOUND);
+      console.log(ERROR_MESSAGES.COUNTRY_NOT_FOUND);
+
+      // If country API doesn't work, use default countries
+      const defaultCountries = ['Afghanistan', 'Albania', 'Algeria', 'Andorra', 'Angola'];
+
+      console.log('defaultCountries', defaultCountries);
+
+      return res.status(STATUS_CODES.OK).json(defaultCountries);
     }
 
     // Map the response to the desired format and sort alphabetically

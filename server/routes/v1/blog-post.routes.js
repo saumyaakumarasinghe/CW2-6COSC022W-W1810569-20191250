@@ -1,21 +1,21 @@
 const express = require('express');
 const blogPostController = require('../../controllers/blog-post.controller');
-const blogPosRoutes = express.Router();
+const blogPosRouter = express.Router();
 
-const { checkAuth } = require('../../middleware/check-token.middleware');
+const { checkAuth } = require('../../middleware/token.middleware');
 
-blogPosRoutes.post('/', checkAuth, blogPostController.createBlogPost);
+blogPosRouter.post('/', checkAuth, blogPostController.createBlogPost);
 
-blogPosRoutes.get('/', blogPostController.getAllBlogPosts);
+blogPosRouter.get('/', blogPostController.getAllBlogPosts);
 
-blogPosRoutes.get('/user', checkAuth, blogPostController.getAllBlogPostsByUserId);
+blogPosRouter.get('/user', checkAuth, blogPostController.getAllBlogPostsByUserId);
 
-blogPosRoutes.get('/user/:userId', checkAuth, blogPostController.getFeedByUserId);
+blogPosRouter.get('/user/:userId', checkAuth, blogPostController.getFeedByUserId);
 
-blogPosRoutes.get('/:id', blogPostController.getSingleBlogPost);
+blogPosRouter.get('/:id', blogPostController.getSingleBlogPost);
 
-blogPosRoutes.put('/:id', checkAuth, blogPostController.updateBlogPost);
+blogPosRouter.put('/:id', checkAuth, blogPostController.updateBlogPost);
 
-blogPosRoutes.delete('/:id', checkAuth, blogPostController.deleteBlogPost);
+blogPosRouter.delete('/:id', checkAuth, blogPostController.deleteBlogPost);
 
-module.exports = blogPosRoutes;
+module.exports = blogPosRouter;

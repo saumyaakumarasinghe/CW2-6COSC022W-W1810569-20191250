@@ -1,11 +1,11 @@
-const userService = require('../services/user.service');
+const userDatabaseService = require('../services/user.database.service');
 const { hashPassword, comparePassword } = require('../utils/password.util');
 const { generateToken } = require('../utils/token.util');
 const { sequelize } = require('../models/index');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 
-const login = async (req, res) => {
+const loginUser = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { email, password } = req.body;
@@ -16,25 +16,26 @@ const login = async (req, res) => {
     }
 
     // check if user exists
-    const existUser = await userService.getUserByEmail(email);
-    if (!existUser) return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
+    const existingUser = await userDatabaseService.getUserByEmail(email);
+    if (!existingUser)
+      return res.status(STATUS_CODES.NOT_FOUND).json(ERROR_MESSAGES.USER_NOT_FOUND);
 
-    if (existUser.status === false)
+    if (existingUser.status === false)
       return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_NOT_ACTIVE);
 
-    const loggedIn = await comparePassword(password, existUser.password);
+    const loggedIn = await comparePassword(password, existingUser.password);
     if (!loggedIn)
       return res.status(STATUS_CODES.UNAUTHORIZED).json(ERROR_MESSAGES.INVALID_CREDENTIALS);
 
     // update last active at
     const now = Date.now();
-    const updatedUser = await userService.updateUser(existUser.id, { now }, transaction);
+    const updatedUser = await userDatabaseService.updateUser(existingUser.id, { now }, transaction);
 
     // create token
     const tokenPayload = {
-      userId: existUser.id,
-      role: existUser.role,
-      status: existUser.status,
+      userId: existingUser.id,
+      role: existingUser.role,
+      status: existingUser.status,
       lastActiveAt: updatedUser.lastActiveAt,
     };
     const token = await generateToken(tokenPayload);
@@ -43,13 +44,13 @@ const login = async (req, res) => {
       message: 'Login successful',
       token,
       user: {
-        id: existUser.id,
-        firstName: existUser.firstName,
-        lastName: existUser.lastName,
-        userName: existUser.userName,
-        email: existUser.email,
-        role: existUser.role,
-        status: existUser.status,
+        id: existingUser.id,
+        firstName: existingUser.firstName,
+        lastName: existingUser.lastName,
+        userName: existingUser.userName,
+        email: existingUser.email,
+        role: existingUser.role,
+        status: existingUser.status,
       },
     };
     await transaction.commit();
@@ -61,7 +62,7 @@ const login = async (req, res) => {
   }
 };
 
-const register = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
     let { userName, firstName, lastName, email, mobile, password } = req.body;
 
@@ -71,13 +72,13 @@ const register = async (req, res) => {
     }
 
     // check email already exist
-    const existUser = await userService.getUserByEmail(email);
-    if (existUser)
+    const existingUser = await userDatabaseService.getUserByEmail(email);
+    if (existingUser)
       return res.status(STATUS_CODES.FORBIDDEN).json(ERROR_MESSAGES.USER_ALREADY_EXISTS);
 
     password = await hashPassword(password);
 
-    const user = await userService.createUser(
+    const createdUser = await userDatabaseService.createUser(
       userName,
       email,
       mobile,
@@ -87,7 +88,7 @@ const register = async (req, res) => {
     );
 
     const payload = {
-      userId: user.id,
+      userId: createdUser.id,
     };
     res.status(STATUS_CODES.OK).json(payload);
   } catch (err) {
@@ -106,7 +107,7 @@ const resetPassword = async (req, res) => {
       return res.status(STATUS_CODES.BAD_REQUEST).json(ERROR_MESSAGES.INVALID_REQUEST_BODY);
     }
 
-    const user = await userService.getUserById(userId);
+    const user = await userDatabaseService.getUserById(userId);
 
     // verify old password
     const isPasswordValid = await comparePassword(oldPassword, user.password);
@@ -118,7 +119,7 @@ const resetPassword = async (req, res) => {
     const hashedPassword = await hashPassword(newPassword);
 
     // update password
-    await userService.updateUser(userId, { password: hashedPassword });
+    await userDatabaseService.updateUser(userId, { password: hashedPassword });
 
     res.status(STATUS_CODES.OK).json({
       message: 'Password reset successfully',
@@ -130,7 +131,7 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
-  login,
-  register,
+  loginUser,
+  registerUser,
   resetPassword,
 };

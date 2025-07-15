@@ -1,4 +1,4 @@
-const likeService = require('../services/like.service');
+const likeService = require('../services/like.database.service');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 

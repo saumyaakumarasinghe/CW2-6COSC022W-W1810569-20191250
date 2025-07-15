@@ -1,11 +1,11 @@
 const express = require('express');
-const commonRoutes = express.Router();
+const commonRouter = express.Router();
 
-commonRoutes.get('/health', (req, res) => {
+commonRouter.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
     timestamp: new Date().toISOString(),
   });
 });
 
-module.exports = commonRoutes;
+module.exports = commonRouter;

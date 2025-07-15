@@ -1,26 +1,4 @@
 paths:
-  /api/health:
-    get:
-      tags:
-        - Common
-      summary: Health check
-      description: Returns the health status of the API server.
-      responses:
-        200:
-          description: Server is healthy.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: 'OK'
-                  timestamp:
-                    type: string
-                    format: date-time
-                    example: '2024-01-15T10:30:00.000Z'
-
   /api/v1/country:
     get:
       tags:
@@ -72,17 +50,6 @@ paths:
 
 components:
   schemas:
-    HealthResponse:
-      type: object
-      properties:
-        status:
-          type: string
-          example: 'OK'
-        timestamp:
-          type: string
-          format: date-time
-          example: '2024-01-15T10:30:00.000Z'
-
     CountryList:
       type: array
       items:

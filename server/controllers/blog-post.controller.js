@@ -1,4 +1,4 @@
-const blogPostService = require('../services/blog-post.service');
+const blogPostService = require('../services/blog-post.database.service');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 

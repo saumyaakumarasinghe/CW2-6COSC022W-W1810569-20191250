@@ -1,19 +1,12 @@
 paths:
-  /api/v1/blog-post/{id}/comment:
+  /api/v1/comment:
     post:
       tags:
         - Comments
-      summary: Add a comment to a blog post
-      description: Creates a new comment on a specific blog post.
+      summary: Create a new comment
+      description: Creates a new comment on a blog post.
       security:
         - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of the blog post
       requestBody:
         required: true
         content:
@@ -21,43 +14,24 @@ paths:
             schema:
               type: object
               required:
+                - postId
                 - content
               properties:
+                postId:
+                  type: integer
+                  example: 1
                 content:
                   type: string
-                  example: 'This is a great post! Thanks for sharing.'
+                  example: 'Great post! I really enjoyed reading about your trip.'
       responses:
         201:
-          description: Comment added successfully.
+          description: Comment created successfully.
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  content:
-                    type: string
-                    example: 'This is a great post! Thanks for sharing.'
-                  userId:
-                    type: integer
-                    example: 1
-                  blogPostId:
-                    type: integer
-                    example: 1
-                  user:
-                    $ref: '#/components/schemas/User'
-                  createdAt:
-                    type: string
-                    format: date-time
-                    example: '2024-03-15T10:30:00Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    example: '2024-03-15T10:30:00Z'
-        401:
-          description: Unauthorized - User not authenticated.
+                $ref: '#/components/schemas/Comment'
+        400:
+          description: Invalid request body.
           content:
             application/json:
               schema:
@@ -65,17 +39,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Unauthorized'
-        404:
-          description: Blog post not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Blog post not found'
+                    example: 'Invalid request body properties'
         500:
           description: Internal server error.
           content:
@@ -83,34 +47,23 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
+  /api/v1/comment/{postId}:
     get:
       tags:
         - Comments
-      summary: Get all comments for a blog post
-      description: Retrieves all comments for a specific blog post with pagination.
+      summary: Get all comments for a post
+      description: Retrieves all comments for a specific blog post.
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
           schema:
             type: integer
-          description: ID of the blog post
-        - name: limit
-          in: query
-          schema:
-            type: integer
-            default: 10
-          description: Number of comments to return
-        - name: skip
-          in: query
-          schema:
-            type: integer
-            default: 0
-          description: Number of comments to skip
+          description: Blog post ID
       responses:
         200:
           description: Comments retrieved successfully.
@@ -119,52 +72,23 @@ paths:
               schema:
                 type: object
                 properties:
+                  total:
+                    type: integer
+                    example: 25
                   comments:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        id:
-                          type: integer
-                          example: 1
-                        content:
-                          type: string
-                          example: 'This is a great post! Thanks for sharing.'
-                        userId:
-                          type: integer
-                          example: 1
-                        blogPostId:
-                          type: integer
-                          example: 1
-                        user:
-                          $ref: '#/components/schemas/User'
-                        createdAt:
-                          type: string
-                          format: date-time
-                          example: '2024-03-15T10:30:00Z'
-                        updatedAt:
-                          type: string
-                          format: date-time
-                          example: '2024-03-15T10:30:00Z'
-                  total:
-                    type: integer
-                    example: 50
-                  limit:
-                    type: integer
-                    example: 10
-                  skip:
-                    type: integer
-                    example: 0
-        404:
-          description: Blog post not found.
+                      $ref: '#/components/schemas/Comment'
+        400:
+          description: Post ID is required.
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    example: 'Blog post not found'
+                    example: 'Post ID is required'
         500:
           description: Internal server error.
           content:
@@ -172,111 +96,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: 'Internal server error'
-
-  /api/v1/blog-post/{id}/comment/{commentId}:
-    put:
-      tags:
-        - Comments
-      summary: Update a comment
-      description: Updates an existing comment on a blog post.
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of the blog post
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of the comment
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - content
-              properties:
-                content:
-                  type: string
-                  example: 'Updated comment content'
-      responses:
-        200:
-          description: Comment updated successfully.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    example: 1
-                  content:
-                    type: string
-                    example: 'Updated comment content'
-                  userId:
-                    type: integer
-                    example: 1
-                  blogPostId:
-                    type: integer
-                    example: 1
-                  user:
-                    $ref: '#/components/schemas/User'
-                  createdAt:
-                    type: string
-                    format: date-time
-                    example: '2024-03-15T10:30:00Z'
-                  updatedAt:
-                    type: string
-                    format: date-time
-                    example: '2024-03-15T10:30:00Z'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
-        403:
-          description: Not authorized to update this comment.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Not authorized to update this comment'
-        404:
-          description: Blog post or comment not found.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Blog post or comment not found'
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
@@ -284,22 +104,18 @@ paths:
       tags:
         - Comments
       summary: Delete a comment
-      description: Deletes a comment from a blog post.
+      description: |
+        Deletes a comment. Only the comment owner can delete it. 
+        Note: The route parameter is named 'postId' but it actually represents the comment ID.
       security:
         - BearerAuth: []
       parameters:
-        - name: id
+        - name: postId
           in: path
           required: true
           schema:
             type: integer
-          description: ID of the blog post
-        - name: commentId
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of the comment
+          description: Comment ID (route parameter is postId but represents comment ID)
       responses:
         200:
           description: Comment deleted successfully.
@@ -311,16 +127,6 @@ paths:
                   message:
                     type: string
                     example: 'Comment deleted successfully'
-        401:
-          description: Unauthorized - User not authenticated.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: 'Unauthorized'
         403:
           description: Not authorized to delete this comment.
           content:
@@ -328,11 +134,11 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
-                    example: 'Not authorized to delete this comment'
+                    example: 'You are not authorized to delete this comment'
         404:
-          description: Blog post or comment not found.
+          description: Comment not found.
           content:
             application/json:
               schema:
@@ -340,7 +146,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: 'Blog post or comment not found'
+                    example: 'Comment not found'
         500:
           description: Internal server error.
           content:
@@ -348,18 +154,75 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  error:
                     type: string
                     example: 'Internal server error'
 
 components:
   schemas:
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        postId:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: 'Great post! I really enjoyed reading about your trip.'
+        status:
+          type: string
+          enum: [active, deleted]
+          example: 'active'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2024-01-15T10:30:00.000Z'
+        user:
+          $ref: '#/components/schemas/User'
+
+    CreateCommentRequest:
+      type: object
+      required:
+        - postId
+        - content
+      properties:
+        postId:
+          type: integer
+          example: 1
+        content:
+          type: string
+          example: 'Great post! I really enjoyed reading about your trip.'
+
+    CommentListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 25
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+
     User:
       type: object
       properties:
         id:
           type: integer
           example: 1
+        userName:
+          type: string
+          example: johndoe
         firstName:
           type: string
           example: John
@@ -368,27 +231,21 @@ components:
           example: Doe
         email:
           type: string
-          format: email
           example: john.doe@example.com
-        mobile:
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
           type: string
-          example: '+1234567890'
-        role:
+          example: 'Operation successful'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
           type: string
-          enum: [USER, ADMIN]
-          example: 'USER'
-        status:
-          type: boolean
-          example: true
-        lastActivateAt:
+          example: 'Error message'
+        error:
           type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2024-03-15T10:30:00Z'
+          example: 'Error message'

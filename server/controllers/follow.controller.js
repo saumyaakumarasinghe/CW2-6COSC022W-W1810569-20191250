@@ -1,4 +1,4 @@
-const followService = require('../services/follow.service');
+const followService = require('../services/follow.database.service');
 const { STATUS_CODES } = require('../constants/status-code.constants');
 const { ERROR_MESSAGES } = require('../constants/error.constants');
 
